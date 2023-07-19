@@ -1,0 +1,13 @@
+.env
+/appcopy.js
+/node_modules
+
+# Google
+.gcloudignore
+app.yaml
+
+# General
+TODO.md
+
+#tests
+/controllers/manager.js
