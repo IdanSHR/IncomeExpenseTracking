@@ -7,8 +7,6 @@ If you're interested in having a test run before diving into the code, I've set 
 [CLICK HERE](https://t.me/IncomeExpenseTrackingBot).
 Feel free to explore its features and see the bot in action.
 
-<a href="https://www.buymeacoffee.com/idanshr" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-1.svg" alt="buy me a coffee" width="200px"/></a>
-
 ## Features 🚀
 
 1. 📌 **User-Friendly Interface:** A simplistic and intuitive Telegram interface that allows users to easily input income and expenses.
@@ -84,6 +82,8 @@ If you're enthusiastic about improving the Revenue Expense Tracking Bot, we welc
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) file for details.
 
 ## Contact 📞
+
+<a href="https://www.buymeacoffee.com/idanshr" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-1.svg" alt="buy me a coffee" width="200px"/></a>
 
 Idan Shasha Rain - I'm always open to discussions, questions, or suggestions. Feel free to reach out!
 [LinkedIn](https://www.linkedin.com/in/idanshasha/)
