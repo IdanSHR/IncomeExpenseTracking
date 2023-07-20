@@ -2,7 +2,10 @@
 
 Welcome to the Income Expense Tracking Bot, a dynamic tool constructed to meticulously track and manage both income and expenses for personal and business accounting. With an easy-to-use Telegram bot interface, comprehensive financial data categorization, and insightful report generation, this bot is your companion in achieving a deep understanding of your financial situation.
 
-If you're interested in having a test run before diving into the code, I've set up a sample bot at this link: [CLICK HERE](https://t.me/IncomeExpenseTrackingBot). Feel free to explore its features and see the bot in action.
+If you're interested in having a test run before diving into the code, I've set up a sample bot at this link: 
+[CLICK HERE](https://t.me/IncomeExpenseTrackingBot).
+Feel free to explore its features and see the bot in action.
+<a href="https://www.buymeacoffee.com/idanshr" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-1.svg" alt="buy me a coffee" width="200px"/></a>
 
 ## Features 🚀
 
