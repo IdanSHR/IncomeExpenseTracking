@@ -1,4 +1,5 @@
 
+
 # Income Expense Tracking Bot 🤖💰
 
 Welcome to the Income Expense Tracking Bot, a dynamic tool constructed to meticulously track and manage both income and expenses for personal and business accounting. With an easy-to-use Telegram bot interface, comprehensive financial data categorization, and insightful report generation, this bot is your companion in achieving a deep understanding of your financial situation.
@@ -52,9 +53,8 @@ Open the bot in your web browser at `http://localhost:3000` and follow the on-sc
 
 ## Screenshots 📸
 
-![Screenshot 1](https://chat.openai.com/c/screenshots/screenshot1.png)
+<img src="https://media.licdn.com/dms/image/D4D22AQHDgVjjBu-UNw/feedshare-shrink_1280/0/1689842458753?e=1692835200&v=beta&t=vb3dQHJRPOJYdxgzDLiKSmTyW7mO7DheT9qNXYTK8Aw" width="300px">
 
-![Screenshot 2](https://chat.openai.com/c/screenshots/screenshot2.png)
 
 ## Technologies Used 👨‍💻
 
