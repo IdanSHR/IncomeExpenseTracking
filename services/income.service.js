@@ -3,13 +3,6 @@ const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
 const { encrypt, decrypt } = require("../utils/encrypt");
 
-async function setNewIncome(familyId) {
-    if (!familyId) {
-        return { error: lang.INCOME.ERROR_CREATING };
-    }
-    return new Income({ familyId });
-}
-
 async function saveNewIncome(income) {
     if (!income) {
         return { error: lang.INCOME.ERROR_ADDING };
@@ -19,6 +12,26 @@ async function saveNewIncome(income) {
         income.name = encrypt(income.name);
         income.amount = encrypt(income.amount.toString());
         return await Income.create(income);
+    } catch (error) {
+        return { error };
+    }
+}
+
+async function queryIncomes(filters) {
+    try {
+        const incomes = await Income.find(filters);
+        return incomes;
+    } catch (error) {
+        return { error };
+    }
+}
+async function deleteIncome(incomeId) {
+    if (!incomeId) {
+        return { error: lang.INCOME.ERROR_DELETING };
+    }
+
+    try {
+        return await Income.findByIdAndDelete(incomeId);
     } catch (error) {
         return { error };
     }
@@ -74,5 +87,4 @@ async function getMonthIncomes(family, month = null, year = null) {
 
     return decryptedIncomes;
 }
-
-module.exports = { setNewIncome, saveNewIncome, getMonthIncomes };
+module.exports = { saveNewIncome, deleteIncome, queryIncomes, getMonthIncomes };

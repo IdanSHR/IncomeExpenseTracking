@@ -8,6 +8,9 @@ const { registerExpenseCommands } = require("./controllers/expense");
 const { registerStatisticsCommands } = require("./controllers/insights");
 const { registerFamilyCommands } = require("./controllers/family");
 
+//Register all Cron Jobs
+const expenseCron = require("./crons/expense.cron");
+
 //Init ENV variables
 require("dotenv").config();
 const token = process.env.TELEGTAM_API_TOKEN;
@@ -36,6 +39,7 @@ registerFamilyCommands(bot);
 registerIncomeCommands(bot);
 registerExpenseCommands(bot);
 registerStatisticsCommands(bot);
+expenseCron();
 
 bot.onText(/\/userid/, async (msg) => {
     const chatId = msg.chat.id;

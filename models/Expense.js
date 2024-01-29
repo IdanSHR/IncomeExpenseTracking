@@ -5,6 +5,7 @@ const ExpenseSchema = new mongoose.Schema({
     name: String,
     category: String,
     cost: String,
+    isRecurring: { type: Boolean, default: false },
     date: { type: Date, default: Date.now },
 });
 

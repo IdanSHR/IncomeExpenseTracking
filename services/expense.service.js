@@ -4,13 +4,6 @@ const { encrypt, decrypt } = require("../utils/encrypt");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
 
-async function setNewExpense(familyId) {
-    if (!familyId) {
-        return { error: lang.EXPENSE.ERROR_CREATING };
-    }
-    return new Expense({ familyId });
-}
-
 async function saveNewExpense(expense) {
     if (!expense || !expense?.name || !expense.cost) {
         return { error: lang.EXPENSE.ERROR_ADDING };
@@ -20,6 +13,26 @@ async function saveNewExpense(expense) {
         expense.name = encrypt(expense.name);
         expense.cost = encrypt(expense.cost.toString());
         return await Expense.create(expense);
+    } catch (error) {
+        return { error };
+    }
+}
+
+async function queryExpenses(filters) {
+    try {
+        const expenses = await Expense.find(filters);
+        return expenses;
+    } catch (error) {
+        return { error };
+    }
+}
+async function deleteExpense(expenseId) {
+    if (!expenseId) {
+        return { error: lang.EXPENSE.ERROR_DELETING };
+    }
+
+    try {
+        return await Expense.findByIdAndDelete(expenseId);
     } catch (error) {
         return { error };
     }
@@ -65,4 +78,22 @@ async function getMonthExpense(family, month = null, year = null) {
     return decryptedExpenses;
 }
 
-module.exports = { setNewExpense, saveNewExpense, getMonthExpense };
+async function makeExpenseRecurring(expenseId) {
+    if (!expenseId) {
+        return { error: "lang.EXPENSE.ERROR_ADDING_RECURRING" };
+    }
+
+    try {
+        const expense = await Expense.findById(expenseId);
+        if (!expense) {
+            return { error: "lang.EXPENSE.ERROR_ADDING_RECURRING" };
+        }
+
+        expense.isRecurring = true;
+        return await expense.save();
+    } catch (error) {
+        return { error };
+    }
+}
+
+module.exports = { saveNewExpense, deleteExpense, queryExpenses, getMonthExpense, makeExpenseRecurring };

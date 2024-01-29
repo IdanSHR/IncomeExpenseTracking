@@ -1,7 +1,7 @@
 const { Income } = require("../models/Income");
 const { botSendMessage } = require("../utils/bot");
 const { findUserFamilyId } = require("../services/family.service");
-const { setNewIncome, saveNewIncome, newIncome } = require("../services/income.service");
+const { saveNewIncome, deleteIncome } = require("../services/income.service");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
 const incomeSteps = {};
@@ -17,7 +17,7 @@ function registerIncomeCommands(bot) {
             return (incomeSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_NOT_FOUND, incomeSteps[chatId]?.lastMsgId));
         }
 
-        const newIncome = await setNewIncome(familyId);
+        const newIncome = new Income({ familyId });
         if (newIncome?.error) {
             if (!incomeSteps[chatId]) incomeSteps[chatId] = {};
             return (incomeSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, newIncome.error, incomeSteps[chatId]?.lastMsgId));
