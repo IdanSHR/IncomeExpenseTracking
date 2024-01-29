@@ -1,21 +1,26 @@
 require("dotenv").config();
-const adminId = process.env.TELEGRAM_ADMIN_USERID;
+const adminIds = process.env.TELEGRAM_ADMIN_USERID;
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
+
+// Options
 const cancelOpts = {
     reply_markup: {
         inline_keyboard: [[{ text: lang.GENERAL.CANCEL, callback_data: "cancel" }]],
     },
 };
+
 const backOpts = {
     reply_markup: {
         inline_keyboard: [[{ text: lang.GENERAL.BACK_TO_MENU, callback_data: "back_to_main_menu" }]],
     },
 };
 
+//Functions
 function isAdmin(userId) {
-    return adminId.includes(userId.toString());
+    return adminIds.includes(userId.toString());
 }
+
 async function botSendMessage(bot, chatId, message, lastMsgId = null, options = []) {
     //Delete last message
     try {
@@ -30,6 +35,7 @@ async function botSendMessage(bot, chatId, message, lastMsgId = null, options = 
         console.error(error);
     }
 }
+
 async function botEditMessage(bot, chatId, message, lastMsgId = null, options = []) {
     try {
         if (lastMsgId) {

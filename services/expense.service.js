@@ -1,9 +1,9 @@
 const { Expense } = require("../models/Expense");
-const moment = require("moment");
 const { encrypt, decrypt } = require("../utils/encrypt");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
 
+// Create a new expense
 async function saveNewExpense(expense) {
     if (!expense || !expense?.name || !expense.cost) {
         return { error: lang.EXPENSE.ERROR_ADDING };
@@ -18,14 +18,31 @@ async function saveNewExpense(expense) {
     }
 }
 
-async function queryExpenses(filters) {
+// Query expenses and decrypt them
+async function queryExpenses(filters = {}) {
     try {
-        const expenses = await Expense.find(filters);
-        return expenses;
+        const expenses = await Expense.find(filters).sort({ category: 1 }).exec();
+        const decryptedExpenses = [];
+
+        for (const expense of expenses) {
+            decryptedExpenses.push({
+                _id: expense._id,
+                familyId: expense.familyId,
+                date: expense.date,
+                name: decrypt(expense.name) || "undefined",
+                cost: parseFloat(decrypt(expense.cost) || 0),
+                category: expense.category,
+                isRecurring: expense.isRecurring,
+            });
+        }
+
+        return decryptedExpenses;
     } catch (error) {
         return { error };
     }
 }
+
+// Delete an expense
 async function deleteExpense(expenseId) {
     if (!expenseId) {
         return { error: lang.EXPENSE.ERROR_DELETING };
@@ -38,55 +55,43 @@ async function deleteExpense(expenseId) {
     }
 }
 
+// Get all the expenses of a family for a given month
 async function getMonthExpense(family, month = null, year = null) {
     if (!family) {
         return { error: lang.FAMILY.ERROR_WRONG_FAMILY };
     }
 
-    let startDate;
-    if (year !== null && month !== null) {
-        startDate = moment([year, month - 1, family.startDay]);
-    } else if (year === null && month !== null) {
-        startDate = moment([moment().year(), month - 1, family.startDay]);
-    } else {
-        startDate = moment().date(family.startDay);
-    }
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
 
-    const endDate = moment(startDate).add(1, "months");
-    const decryptedExpenses = [];
-    const expenses = await Expense.find({
+    const familyStartDay = family.startDay || 1;
+    const startYear = year !== null ? year : currentYear;
+    const startMonth = month !== null ? month - 1 : currentMonth;
+    const startDate = new Date(startYear, startMonth, familyStartDay);
+    const endDate = new Date(startYear, startMonth + 1, familyStartDay);
+
+    const expenses = await queryExpenses({
         familyId: family._id,
         date: {
-            $gte: startDate.toDate(),
-            $lt: endDate.toDate(),
+            $gte: startDate,
+            $lt: endDate,
         },
-    })
-        .sort({ category: 1 })
-        .exec();
+    });
 
-    for (const expense of expenses) {
-        decryptedExpenses.push({
-            _id: expense._id,
-            familyId: expense.familyId,
-            category: expense.category,
-            date: expense.date,
-            name: decrypt(expense.name) || "undefined",
-            cost: parseFloat(decrypt(expense.cost) || 0),
-        });
-    }
-
-    return decryptedExpenses;
+    return expenses;
 }
 
+// Make an expense recurring by its id (used by the cron job)
 async function makeExpenseRecurring(expenseId) {
     if (!expenseId) {
-        return { error: "lang.EXPENSE.ERROR_ADDING_RECURRING" };
+        return { error: lang.EXPENSE.ERROR_ADDING_RECURRING };
     }
 
     try {
         const expense = await Expense.findById(expenseId);
         if (!expense) {
-            return { error: "lang.EXPENSE.ERROR_ADDING_RECURRING" };
+            return { error: lang.EXPENSE.ERROR_ADDING_RECURRING };
         }
 
         expense.isRecurring = true;

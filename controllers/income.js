@@ -75,6 +75,8 @@ function registerIncomeCommands(bot) {
             delete incomeSteps[message.chat.id];
             return;
         }
+
+        bot.answerCallbackQuery(callbackQuery.id);
     });
 }
 

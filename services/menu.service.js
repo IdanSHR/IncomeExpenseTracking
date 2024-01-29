@@ -1,6 +1,6 @@
 const { botSendMessage, botEditMessage } = require("../utils/bot");
 const { findUserFamilyId } = require("./family.service");
-const { getFamilyCategories, addCategory, editCategory, removeCategory, setFamilyName, setStartDay, setCategoryLimit } = require("./family.service");
+const { addCategory, removeCategory, editCategory, getFamilyCategories, setCategoryLimit } = require("./category.service");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
 function setMenuButtons(buttons) {
@@ -130,6 +130,7 @@ async function deleteCategory(bot, menuStep, chatId) {
         }
 
         menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.CATEGORY.SUCCESS_DELETING, menuStep[chatId].lastMsgId, "back_to_main_menu");
+        bot.answerCallbackQuery(callbackQuery.id);
     });
 }
 async function renameCategory(bot, menuStep, chatId) {
@@ -168,6 +169,7 @@ async function renameCategory(bot, menuStep, chatId) {
             }
 
             menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.CATEGORY.SUCCESS_EDITING, menuStep[chatId].lastMsgId, "back_to_main_menu");
+            bot.answerCallbackQuery(callbackQuery.id);
         });
     });
 }
@@ -199,6 +201,7 @@ async function handleSetCategoryLimit(bot, menuStep, chatId) {
         }
         menuStep[chatId].category = data;
         menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.CATEGORY.PROMPT_NEW_LIMIT, menuStep[chatId].lastMsgId);
+        bot.answerCallbackQuery(callbackQuery.id);
     });
 }
 async function updateCategoryLimit(bot, menuStep, chatId, limit) {

@@ -1,70 +1,6 @@
 const { Family } = require("../models/Family");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
-async function addCategory(familyId, category, monthlyLimit = 0) {
-    try {
-        const family = await Family.findById(familyId);
-        if (!family) {
-            return { error: lang.FAMILY.ERROR_NOT_FOUND };
-        }
-
-        family.categories.push({ name: category, monthlyLimit: monthlyLimit });
-        return { data: await family.save() };
-    } catch (error) {
-        return { error };
-    }
-}
-
-async function removeCategory(familyId, categoryId) {
-    try {
-        const family = await Family.findById(familyId);
-        if (!family) {
-            return { error: lang.FAMILY.ERROR_NOT_FOUND };
-        }
-
-        const category = family.categories.find((category) => category.id.toString() === categoryId);
-        if (!category) {
-            return { error: lang.CATEGORY.ERROR_NOT_FOUND };
-        }
-
-        category.isActive = false;
-        return { data: await family.save() };
-    } catch (error) {
-        return { error };
-    }
-}
-
-async function editCategory(familyId, categoryId, newCategoryName) {
-    try {
-        const family = await Family.findById(familyId);
-        if (!family) {
-            return { error: lang.FAMILY.ERROR_NOT_FOUND };
-        }
-
-        const category = family.categories.find((category) => category.id.toString() === categoryId);
-        if (!category) {
-            return { error: lang.CATEGORY.ERROR_NOT_FOUND };
-        }
-
-        category.name = newCategoryName;
-        return { data: await family.save() };
-    } catch (error) {
-        return { error };
-    }
-}
-
-async function getFamilyCategories(familyId, includeInactive = false) {
-    try {
-        const family = await Family.findById(familyId);
-        if (!family) {
-            return { error: lang.FAMILY.ERROR_NOT_FOUND };
-        }
-
-        return { data: includeInactive ? family.categories : family.categories.filter((category) => category.isActive) };
-    } catch (error) {
-        return { error };
-    }
-}
 
 // Add a family to the db
 async function registerFamily(name, members = []) {
@@ -78,6 +14,7 @@ async function registerFamily(name, members = []) {
         return { error };
     }
 }
+
 // Edit a family name
 async function setFamilyName(familyId, name) {
     const family = await Family.findById(familyId);
@@ -101,33 +38,14 @@ async function registerFamilyMember(familyId, userId) {
     family.members.push(userId);
     await family.save();
 }
-// Set a start day for a family
-async function setStartDay(familyId, day) {
-    const family = await Family.findById(familyId);
-    if (!family) {
-        return { error: lang.FAMILY.ERROR_NOT_FOUND };
-    }
-    family.startDay = day;
-    await family.save();
-    return true;
-}
-async function setCategoryLimit(familyId, categoryId, limit) {
-    const family = await Family.findById(familyId);
-    if (!family) {
-        return { error: lang.FAMILY.ERROR_NOT_FOUND };
-    }
 
-    const categories = family.categories;
-    if (!categories) {
-        return { error: lang.CATEGORY.ERROR_NO_CATEGORIES };
+// Return the family by the familyId
+async function getFamilyById(familyId) {
+    const family = await Family.findOne({ _id: familyId });
+    if (!family) {
+        return { error: lang.FAMILY.ERROR_NOT_FOUND };
     }
-    const currentCategory = categories.find((category) => category._id.toString() === categoryId);
-    if (!currentCategory) {
-        return { error: lang.CATEGORY.ERROR_NOT_FOUND };
-    }
-    currentCategory.monthlyLimit = limit;
-    await family.save();
-    return true;
+    return family;
 }
 
 // Remove a userId from the family members
@@ -144,7 +62,7 @@ async function removeFamilyMember(familyId, userId) {
     await family.save();
 }
 
-// Return the family id by the userId
+// Return the family by the userId
 async function findUserFamily(userId) {
     const family = await Family.findOne({ members: userId });
     if (!family) {
@@ -152,6 +70,8 @@ async function findUserFamily(userId) {
     }
     return family;
 }
+
+// Return the family id by the userId
 async function findUserFamilyId(userId) {
     try {
         const family = await Family.findOne({ members: userId });
@@ -165,17 +85,24 @@ async function findUserFamilyId(userId) {
     }
 }
 
+// Set a start day for a family
+async function setStartDay(familyId, day) {
+    const family = await Family.findById(familyId);
+    if (!family) {
+        return { error: lang.FAMILY.ERROR_NOT_FOUND };
+    }
+    family.startDay = day;
+    await family.save();
+    return true;
+}
+
 module.exports = {
-    addCategory,
-    removeCategory,
-    editCategory,
-    setCategoryLimit,
     registerFamily,
     registerFamilyMember,
     removeFamilyMember,
+    getFamilyById,
     findUserFamily,
     findUserFamilyId,
-    getFamilyCategories,
-    setStartDay,
     setFamilyName,
+    setStartDay,
 };

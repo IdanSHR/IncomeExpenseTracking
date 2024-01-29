@@ -126,6 +126,7 @@ function registerMenuCommands(bot) {
                 menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_RENAME, menuStep[chatId].lastMsgId, "back_to_main_menu");
             }
         }
+        bot.answerCallbackQuery(callbackQuery.id);
     });
 }
 

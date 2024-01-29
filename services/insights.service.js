@@ -1,4 +1,5 @@
-const { findUserFamily, findUserFamilyId, getFamilyCategories } = require("../services/family.service");
+const { findUserFamily } = require("../services/family.service");
+const { getFamilyCategories } = require("../services/category.service");
 const { botSendMessage } = require("../utils/bot");
 const { getMonthExpense } = require("./expense.service");
 const { getMonthIncomes } = require("./income.service");

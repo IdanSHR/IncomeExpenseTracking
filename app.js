@@ -17,6 +17,7 @@ const token = process.env.TELEGTAM_API_TOKEN;
 const dbUrl = process.env.DB_URL;
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("./lang/" + botLanguage);
+
 //Connect to the DB
 try {
     mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });

@@ -11,6 +11,7 @@ function expenseCron() {
             previousMonth.endOf("month");
         }
 
+        //Implement query here
         const expensesDue = await Expense.find({
             isRecurring: true,
             date: {

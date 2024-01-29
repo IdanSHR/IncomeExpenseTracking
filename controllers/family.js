@@ -1,4 +1,4 @@
-const { addCategory, removeCategory, editCategory, registerFamily, registerFamilyMember, removeFamilyMember, findUserFamilyId, getFamilyCategories } = require("../services/family.service");
+const { registerFamily, registerFamilyMember, removeFamilyMember, findUserFamilyId } = require("../services/family.service");
 const { isAdmin } = require("../utils/bot");
 const { botSendMessage } = require("../utils/bot");
 const botLanguage = process.env.BOT_LANGUAGE;
@@ -63,28 +63,6 @@ async function registerFamilyCommands(bot) {
         try {
             await removeFamilyMember(familyId, memberId);
             bot.sendMessage(chatId, lang.FAMILY.SUCCESS_MEMBER_REMOVING);
-        } catch (error) {
-            bot.sendMessage(chatId, error?.message);
-        }
-    });
-
-    bot.onText(/\/ac (\S+) (.+)/, async (msg, match) => {
-        const chatId = msg.chat.id;
-        const userId = msg.from.id;
-        const familyId = match[1];
-        const category = match[2];
-
-        // Check if user is admin
-        if (!isAdmin(userId)) {
-            return bot.sendMessage(chatId, lang.GENERAL.ERROR_ADMIN);
-        }
-
-        try {
-            const response = await addCategory(familyId, category);
-            if (response?.error) {
-                bot.sendMessage(chatId, response.error);
-            }
-            bot.sendMessage(chatId, lang.CATEGORY.SUCCESS_ADDING);
         } catch (error) {
             bot.sendMessage(chatId, error?.message);
         }

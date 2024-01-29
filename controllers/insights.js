@@ -1,5 +1,6 @@
 const { Expense } = require("../models/Expense");
-const { findUserFamily, findUserFamilyId, getFamilyCategories } = require("../services/family.service");
+const { findUserFamily, findUserFamilyId } = require("../services/family.service");
+const { getFamilyCategories } = require("../services/category.service");
 
 const { sendStatus, sendCategories, sendMonthlyChange, sendExpensiveDay } = require("../services/insights.service");
 const { getMonthExpense } = require("../services/expense.service");
@@ -45,6 +46,7 @@ function registerStatisticsCommands(bot) {
 
             return await sendStatus(bot, insightStep, chatId, false);
         }
+        bot.answerCallbackQuery(callbackQuery.id);
     });
     //Change it!
     bot.onText(/\/categories/, async (msg) => {
