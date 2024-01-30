@@ -57,3 +57,14 @@ bot.onText(/\/userid/, async (msg) => {
 //         console.log(eventName);
 //     });
 // });
+
+const express = require("express");
+const cors = require("cors");
+//server
+const app = express();
+app.use(cors());
+
+app.get("/", (req, res) => res.send("Hello World!"));
+app.listen(process.env.PORT || 3000, () => {
+    console.log("Server is listening on port " + process.env.PORT || 3000);
+});
