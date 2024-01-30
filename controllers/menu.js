@@ -16,8 +16,10 @@ const {
     updateCategoryLimit,
     deleteCategory,
     sendDeleteExpenseMenu,
+    sendDeleteIncomeMenu,
     sendDeleteExpenseListMenu,
     handleDeleteExpense,
+    handleDeleteIncome,
 } = require("../services/menu.service");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
@@ -141,6 +143,16 @@ function registerMenuCommands(bot) {
         } else if (data.includes("expense_delete_item")) {
             const expenseId = data.split("expense_delete_item_")[1];
             return await handleDeleteExpense(bot, menuStep, chatId, expenseId);
+        }
+
+        //Income Menu
+        else if (data === "back_to_income_menu") {
+            return await sendIncomeMenu(bot, menuStep, chatId);
+        } else if (data === "income_delete") {
+            return await sendDeleteIncomeMenu(bot, menuStep, chatId);
+        } else if (data.includes("income_delete_item")) {
+            const incomeId = data.split("income_delete_item_")[1];
+            return await handleDeleteIncome(bot, menuStep, chatId, incomeId);
         }
         bot.answerCallbackQuery(callbackQuery.id);
     });

@@ -22,6 +22,12 @@ const backExpense = {
     },
 };
 
+const backIncome = {
+    reply_markup: {
+        inline_keyboard: [[{ text: lang.MENU.INCOME.BACK_TO_MENU, callback_data: "back_to_income_menu" }]],
+    },
+};
+
 //Functions
 function isAdmin(userId) {
     return adminIds.includes(userId.toString());
@@ -34,6 +40,8 @@ function getMenu(options) {
             return cancelOpts;
         case "back_to_expense_menu":
             return backExpense;
+        case "back_to_income_menu":
+            return backIncome;
     }
     return options;
 }

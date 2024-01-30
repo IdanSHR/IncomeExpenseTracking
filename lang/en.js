@@ -25,14 +25,16 @@ module.exports = {
         ERROR_CREATING: "❌ Failed to create expense",
         ERROR_ADDING: "❌ Failed to add expense",
         ERROR_DELETING: "❌ Failed to delete expense",
-        ERROR_NO_EXPENSES_CATEGORY: "❌ No expenses found for this category",
+        ERROR_NO_EXPENSES_CATEGORY: "❌ No expenses found for this category from the last time",
     },
     INCOME: {
         PROMPT_NAME: "✏️ Enter the income name:",
         PROMPT_AMOUNT: "💰 Enter the income amount:",
         SUCCESS_ADDING: "✅ Income added successfully!",
+        SUCCESS_DELETING: "✅ Income deleted successfully.",
         ERROR_CREATING: "❌ Failed to create income",
         ERROR_ADDING: "❌ Failed to add income",
+        ERROR_NO_INCOMES: "❌ No incomes found from the last time",
     },
     FAMILY: {
         PROMPT_RENAME: "✒️ What is the new family name you want?",
@@ -147,6 +149,7 @@ Welcome to the category menu, please select an option from the menu: \n
         },
         INCOME: {
             CONTENT: "*Income Menu 💰*\nThis menu will be available soon.",
+            BACK_TO_MENU: "🔙 Back to Income Menu",
             BUTTONS: [
                 [
                     { text: "❌ Delete Income", callback_data: "income_delete" },

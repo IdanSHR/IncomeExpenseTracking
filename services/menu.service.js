@@ -2,12 +2,13 @@ const moment = require("moment");
 const { botSendMessage, botEditMessage } = require("../utils/bot");
 const { findUserFamilyId, setStartDay } = require("./family.service");
 const { addCategory, removeCategory, editCategory, getFamilyCategories, setCategoryLimit } = require("./category.service");
-
 const { queryExpenses, deleteExpense } = require("./expense.service");
+const { queryIncomes, deleteIncome } = require("./income.service");
 
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
 
+//Set menu buttons dynamically
 function setMenuButtons(buttons) {
     if (!buttons) {
         return [];
@@ -31,7 +32,7 @@ function setMenuButtons(buttons) {
     return opts;
 }
 
-//Menus
+//Main menus
 async function sendMainMenu(bot, menuStep, chatId, edit = true) {
     const opts = setMenuButtons(lang.MENU.MAIN.BUTTONS);
     const menuContect = lang.MENU.MAIN.CONTENT;
@@ -42,6 +43,8 @@ async function sendMainMenu(bot, menuStep, chatId, edit = true) {
         menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, menuContect, menuStep[chatId].lastMsgId, opts);
     }
 }
+
+//Family menus
 async function sendFamilyMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.FAMILY.BUTTONS);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.FAMILY.CONTENT, menuStep[chatId].lastMsgId, opts);
@@ -50,6 +53,8 @@ async function sendCategoryMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.CATEGORY.BUTTONS);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.CATEGORY.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
+
+//Expense menus
 async function sendExpenseMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.EXPENSE.BUTTONS);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
@@ -84,29 +89,44 @@ async function sendDeleteExpenseListMenu(bot, menuStep, chatId, categoryId) {
     }
     const opts = setMenuButtons([
         ...expenses.map((expense) => [
-            { text: `${moment(expense.date).format("DD/MM")} - ${expense.name} (${expense.cost.toFixed(2)}${lang.GENERAL.CURRENCY})`, callback_data: `expense_delete_item_${expense._id}` },
+            { text: `${moment(expense.date).format("DD/MM")} - ${expense.name} (${expense.cost?.toFixed(2)}${lang.GENERAL.CURRENCY})`, callback_data: `expense_delete_item_${expense._id}` },
         ]),
         [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_expense_menu" }],
     ]);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
-async function handleDeleteExpense(bot, menuStep, chatId, expenseId) {
-    const response = await deleteExpense(expenseId);
-    if (response?.error) {
-        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
-    }
-    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_DELETING, menuStep[chatId].lastMsgId, "back_to_expense_menu");
-}
+
+//Income menus
 async function sendIncomeMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.INCOME.BUTTONS);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.INCOME.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
+async function sendDeleteIncomeMenu(bot, menuStep, chatId, categoryId) {
+    const familyId = await findUserFamilyId(chatId);
+    if (familyId?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    const fromDate = moment().subtract(30, "days");
+    const incomes = await queryIncomes({ familyId: familyId, date: { $gte: fromDate.toDate() } });
+    if (!incomes.length) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.ERROR_NO_INCOMES, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    const opts = setMenuButtons([
+        ...incomes.map((income) => [
+            { text: `${moment(income.date).format("DD/MM")} - ${income.name} (${income.amount?.toFixed(2)}${lang.GENERAL.CURRENCY})`, callback_data: `income_delete_item_${income._id}` },
+        ]),
+        [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_income_menu" }],
+    ]);
+    menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.INCOME.CONTENT, menuStep[chatId].lastMsgId, opts);
+}
+
+//Insights menu
 async function sendInsightsMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.INSIGHTS.BUTTONS);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.INSIGHTS.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
-//handles
 
+//Handle menu actions
 async function renameFamily(bot, menuStep, chatId, familyNewName) {
     const familyId = await findUserFamilyId(chatId);
     if (familyId?.error) {
@@ -271,6 +291,20 @@ async function updateCategoryLimit(bot, menuStep, chatId, limit) {
     menuStep[chatId].menu = null;
     menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.SUCCESS_EDIT_LIMIT + limit.toString() + lang.GENERAL.CURRENCY, menuStep[chatId].lastMsgId, "back_to_main_menu");
 }
+async function handleDeleteExpense(bot, menuStep, chatId, expenseId) {
+    const response = await deleteExpense(expenseId);
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_DELETING, menuStep[chatId].lastMsgId, "back_to_expense_menu");
+}
+async function handleDeleteIncome(bot, menuStep, chatId, incomeId) {
+    const response = await deleteIncome(incomeId);
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_income_menu"));
+    }
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.SUCCESS_DELETING, menuStep[chatId].lastMsgId, "back_to_income_menu");
+}
 module.exports = {
     sendMainMenu,
     sendFamilyMenu,
@@ -281,6 +315,8 @@ module.exports = {
     sendDeleteExpenseMenu,
     sendDeleteExpenseListMenu,
     handleDeleteExpense,
+    handleDeleteIncome,
+    sendDeleteIncomeMenu,
     addNewCategory,
     renameCategory,
     handleSetCategoryLimit,

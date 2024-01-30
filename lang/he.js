@@ -25,14 +25,16 @@ module.exports = {
         ERROR_CREATING: "❌ נכשל ביצירת הוצאה",
         ERROR_ADDING: "❌ נכשל בהוספת הוצאה",
         ERROR_DELETING: "❌ נכשל במחיקת הוצאה",
-        ERROR_NO_EXPENSES_CATEGORY: "❌ לא נמצאו הוצאות לקטגוריה זו",
+        ERROR_NO_EXPENSES_CATEGORY: "❌ לא נמצאו הוצאות לקטגוריה זו מהזמן האחרון",
     },
     INCOME: {
         PROMPT_NAME: "✏️ יש להכניס את שם ההכנסה:",
         PROMPT_AMOUNT: "💰 יש להכניס את סכום ההכנסה:",
         SUCCESS_ADDING: "✅ ההכנסה נוספה בהצלחה!",
+        SUCCESS_DELETING: "✅ ההכנסה נמחקה בהצלחה.",
         ERROR_CREATING: "❌ נכשל ביצירת הכנסה",
         ERROR_ADDING: "❌ נכשל בהוספת הכנסה",
+        ERROR_NO_INCOMES: "❌ לא נמצאו הכנסות מהזמן האחרון",
     },
     FAMILY: {
         PROMPT_RENAME: "✒️ מהו שם המשפחה החדש שתרצו?",
@@ -93,16 +95,16 @@ module.exports = {
             CONTENT: `*תפריט הגדרות ⚙️*
 ברוכים הבאים לתפריט ההגדרות, יש לבחור אופציה מהתפריט: \n
 🔸 👨‍👩‍👧‍👦 משפחה: עריכת שם המשפחה והיום הראשון לחודש.
-🔸 📚 קטגוריות: יצירה ומחיקת קטגוריות, עריכת שם הקטגורייה ועריכת היעד החודשי שלה.
-🔸 💰 הכנסות (בקרוב).
-🔸 💰 💼 הוצאות (בקרוב).
+🔸 📚 קטגוריות: יצירה, עריכה ומחיקת קטגוריות וקביעת יעד חודשי.
+🔸 💰 הכנסות: עריכה ומחיקה של הכנסות מהתקופה האחרונה.
+🔸 💰 💼 הוצאות: עריכה, קביעת הוצאה חודשית חוזרת ומחיקת הוצאות מהזמן האחרון.
 🔸 📊 סטטיסטיקות (בקרוב).`,
             BUTTONS: [
                 [{ text: "👨‍👩‍👧‍👦 משפחה", callback_data: "menu_family" }],
                 [{ text: "📚 קטגוריות", callback_data: "menu_category" }],
                 [{ text: "📊 סטטיסטיקות (בקרוב)", callback_data: "menu_insights" }],
                 [
-                    { text: "💰 הכנסות (בקרוב)", callback_data: "menu_income" },
+                    { text: "💰 הכנסות", callback_data: "menu_income" },
                     { text: "💼 הוצאות", callback_data: "menu_expense" },
                 ],
                 [{ text: "❌ סיום", callback_data: "menu_done" }],
@@ -146,11 +148,12 @@ module.exports = {
             ],
         },
         INCOME: {
-            CONTENT: `*תפריט הכנסות 💰*\nתפריט זה יהיה זמין בקרוב.`,
+            CONTENT: `*תפריט הכנסות 💰*\nברוכים הבאים לתפריט הוצאות, יש לבחור אופציה מהתפריט:\n\n🔸🗑️ מחיקת הכנסה קיימת\n🔸✒️ עריכת שם, סכום או תאריך ההכנסה (בקרוב)`,
+            BACK_TO_MENU: "חזרה לתפריט הכנסות 🔙",
             BUTTONS: [
                 [
                     { text: "❌ מחיקת הכנסה", callback_data: "income_delete" },
-                    { text: "📝 עריכת הכנסה", callback_data: "income_edit" },
+                    { text: "📝 (בקרוב) עריכת הכנסה", callback_data: "income_edit" },
                 ],
                 [{ text: "🔙  חזרה לתפריט הראשי", callback_data: "back_to_main_menu" }],
             ],
