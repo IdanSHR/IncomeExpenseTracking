@@ -1,8 +1,13 @@
+const moment = require("moment");
 const { botSendMessage, botEditMessage } = require("../utils/bot");
-const { findUserFamilyId } = require("./family.service");
+const { findUserFamilyId, setStartDay } = require("./family.service");
 const { addCategory, removeCategory, editCategory, getFamilyCategories, setCategoryLimit } = require("./category.service");
+
+const { queryExpenses, deleteExpense } = require("./expense.service");
+
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
+
 function setMenuButtons(buttons) {
     if (!buttons) {
         return [];
@@ -48,6 +53,49 @@ async function sendCategoryMenu(bot, menuStep, chatId) {
 async function sendExpenseMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.EXPENSE.BUTTONS);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
+}
+async function sendDeleteExpenseMenu(bot, menuStep, chatId) {
+    const familyId = await findUserFamilyId(chatId);
+    if (familyId?.error) {
+        if (!userSteps[chatId]) userSteps[chatId] = {};
+        return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, userSteps[chatId]?.lastMsgId));
+    }
+
+    const response = await getFamilyCategories(familyId);
+    if (response?.error) {
+        return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
+    }
+    const categories = response.data;
+    const opts = setMenuButtons([
+        ...categories.map((category) => [{ text: category.name, callback_data: `expense_delete_list_${category._id}` }]),
+        [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_expense_menu" }],
+    ]);
+    menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
+}
+async function sendDeleteExpenseListMenu(bot, menuStep, chatId, categoryId) {
+    const familyId = await findUserFamilyId(chatId);
+    if (familyId?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    const fromDate = moment().subtract(30, "days");
+    const expenses = await queryExpenses({ familyId: familyId, category: categoryId, date: { $gte: fromDate.toDate() } });
+    if (!expenses.length) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.ERROR_NO_EXPENSES_CATEGORY, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    const opts = setMenuButtons([
+        ...expenses.map((expense) => [
+            { text: `${moment(expense.date).format("DD/MM")} - ${expense.name} (${expense.cost.toFixed(2)}${lang.GENERAL.CURRENCY})`, callback_data: `expense_delete_item_${expense._id}` },
+        ]),
+        [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_expense_menu" }],
+    ]);
+    menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
+}
+async function handleDeleteExpense(bot, menuStep, chatId, expenseId) {
+    const response = await deleteExpense(expenseId);
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_DELETING, menuStep[chatId].lastMsgId, "back_to_expense_menu");
 }
 async function sendIncomeMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.INCOME.BUTTONS);
@@ -230,6 +278,9 @@ module.exports = {
     sendIncomeMenu,
     sendCategoryMenu,
     sendInsightsMenu,
+    sendDeleteExpenseMenu,
+    sendDeleteExpenseListMenu,
+    handleDeleteExpense,
     addNewCategory,
     renameCategory,
     handleSetCategoryLimit,

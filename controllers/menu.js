@@ -1,5 +1,6 @@
 const { botSendMessage, botEditMessage } = require("../utils/bot");
 const { findUserFamilyId } = require("../services/family.service");
+
 const {
     sendMainMenu,
     sendFamilyMenu,
@@ -13,8 +14,10 @@ const {
     renameCategory,
     handleSetCategoryLimit,
     updateCategoryLimit,
-
     deleteCategory,
+    sendDeleteExpenseMenu,
+    sendDeleteExpenseListMenu,
+    handleDeleteExpense,
 } = require("../services/menu.service");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
@@ -125,6 +128,19 @@ function registerMenuCommands(bot) {
             } catch (err) {
                 menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_RENAME, menuStep[chatId].lastMsgId, "back_to_main_menu");
             }
+        }
+
+        //Expense Menu
+        else if (data === "back_to_expense_menu") {
+            return await sendExpenseMenu(bot, menuStep, chatId);
+        } else if (data === "expense_delete") {
+            return await sendDeleteExpenseMenu(bot, menuStep, chatId);
+        } else if (data.includes("expense_delete_list")) {
+            const categoryId = data.split("expense_delete_list_")[1];
+            return await sendDeleteExpenseListMenu(bot, menuStep, chatId, categoryId);
+        } else if (data.includes("expense_delete_item")) {
+            const expenseId = data.split("expense_delete_item_")[1];
+            return await handleDeleteExpense(bot, menuStep, chatId, expenseId);
         }
         bot.answerCallbackQuery(callbackQuery.id);
     });

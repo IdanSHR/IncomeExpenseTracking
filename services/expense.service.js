@@ -2,6 +2,7 @@ const { Expense } = require("../models/Expense");
 const { encrypt, decrypt } = require("../utils/encrypt");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
+const moment = require("moment");
 
 // Create a new expense
 async function saveNewExpense(expense) {
@@ -61,16 +62,18 @@ async function getMonthExpense(family, month = null, year = null) {
         return { error: lang.FAMILY.ERROR_WRONG_FAMILY };
     }
 
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth();
-
-    const familyStartDay = family.startDay || 1;
-    const startYear = year !== null ? year : currentYear;
-    const startMonth = month !== null ? month - 1 : currentMonth;
-    const startDate = new Date(startYear, startMonth, familyStartDay);
-    const endDate = new Date(startYear, startMonth + 1, familyStartDay);
-
+    let startDate;
+    if (year !== null && month !== null) {
+        startDate = moment([year, month - 1, family.startDay]);
+    } else if (year === null && month !== null) {
+        startDate = moment([moment().year(), month - 1, family.startDay]);
+    } else {
+        startDate = moment().date(family.startDay);
+    }
+    if (moment().date() < family.startDay) {
+        startDate = startDate.subtract(1, "months"); // Shift back one month if before startDay
+    }
+    const endDate = moment(startDate).add(1, "months");
     const expenses = await queryExpenses({
         familyId: family._id,
         date: {

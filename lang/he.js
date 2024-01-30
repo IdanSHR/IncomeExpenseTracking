@@ -21,12 +21,15 @@ module.exports = {
         PROMPT_CATEGORY: "📚 יש להכניס את קטגוריית ההוצאה:",
         PROMPT_COST: "💰 יש להכניס את עלות ההוצאה:",
         SUCCESS_ADDING: "✅ ההוצאה נוספה בהצלחה!",
+        SUCCESS_DELETING: "✅ ההוצאה נמחקה בהצלחה.",
         ERROR_CREATING: "❌ נכשל ביצירת הוצאה",
         ERROR_ADDING: "❌ נכשל בהוספת הוצאה",
+        ERROR_DELETING: "❌ נכשל במחיקת הוצאה",
+        ERROR_NO_EXPENSES_CATEGORY: "❌ לא נמצאו הוצאות לקטגוריה זו",
     },
     INCOME: {
         PROMPT_NAME: "✏️ יש להכניס את שם ההכנסה:",
-        PROMPT_AMOUNT: "💰 יש להכניס את סכום ההכנס:",
+        PROMPT_AMOUNT: "💰 יש להכניס את סכום ההכנסה:",
         SUCCESS_ADDING: "✅ ההכנסה נוספה בהצלחה!",
         ERROR_CREATING: "❌ נכשל ביצירת הכנסה",
         ERROR_ADDING: "❌ נכשל בהוספת הכנסה",
@@ -100,7 +103,7 @@ module.exports = {
                 [{ text: "📊 סטטיסטיקות (בקרוב)", callback_data: "menu_insights" }],
                 [
                     { text: "💰 הכנסות (בקרוב)", callback_data: "menu_income" },
-                    { text: "💼 הוצאות (בקרוב)", callback_data: "menu_expense" },
+                    { text: "💼 הוצאות", callback_data: "menu_expense" },
                 ],
                 [{ text: "❌ סיום", callback_data: "menu_done" }],
             ],
@@ -132,11 +135,12 @@ module.exports = {
             ],
         },
         EXPENSE: {
-            CONTENT: `*תפריט הוצאות 💼*\nתפריט זה יהיה זמין בקרוב.`,
+            CONTENT: `*תפריט הוצאות 💼*\nברוכים הבאים לתפריט הוצאות, יש לבחור אופציה מהתפריט:\n\n🔸🗑️ מחיקת הוצאה קיימת\n🔸✒️ עריכת שם, סכום, וקטגוריית ההוצאה, בנוסף לשינוי תאריך הוצאה חוזרת (בקרוב)`,
+            BACK_TO_MENU: "חזרה לתפריט הוצאות 🔙",
             BUTTONS: [
                 [
-                    { text: "❌ מחיקת הוצאה", callback_data: "delete_expense" },
-                    { text: "📝 עריכת הוצאה", callback_data: "edit_expense" },
+                    { text: "❌ מחיקת הוצאה", callback_data: "expense_delete" },
+                    { text: "📝 עריכת הוצאה (בקרוב)", callback_data: "expense_edit" },
                 ],
                 [{ text: "🔙  חזרה לתפריט הראשי", callback_data: "back_to_main_menu" }],
             ],
@@ -145,8 +149,8 @@ module.exports = {
             CONTENT: `*תפריט הכנסות 💰*\nתפריט זה יהיה זמין בקרוב.`,
             BUTTONS: [
                 [
-                    { text: "❌ מחיקת הכנסה", callback_data: "delete_expense" },
-                    { text: "📝 עריכת הכנסה", callback_data: "edit_expense" },
+                    { text: "❌ מחיקת הכנסה", callback_data: "income_delete" },
+                    { text: "📝 עריכת הכנסה", callback_data: "income_edit" },
                 ],
                 [{ text: "🔙  חזרה לתפריט הראשי", callback_data: "back_to_main_menu" }],
             ],

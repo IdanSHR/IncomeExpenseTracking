@@ -16,9 +16,26 @@ const backOpts = {
     },
 };
 
+const backExpense = {
+    reply_markup: {
+        inline_keyboard: [[{ text: lang.MENU.EXPENSE.BACK_TO_MENU, callback_data: "back_to_expense_menu" }]],
+    },
+};
+
 //Functions
 function isAdmin(userId) {
     return adminIds.includes(userId.toString());
+}
+function getMenu(options) {
+    switch (options) {
+        case "back_to_main_menu":
+            return backOpts;
+        case "cancel":
+            return cancelOpts;
+        case "back_to_expense_menu":
+            return backExpense;
+    }
+    return options;
 }
 
 async function botSendMessage(bot, chatId, message, lastMsgId = null, options = []) {
@@ -29,7 +46,7 @@ async function botSendMessage(bot, chatId, message, lastMsgId = null, options = 
         }
 
         //Send new message and return the last message ID
-        const sentMsg = await bot.sendMessage(chatId, message, options === "cancel" ? cancelOpts : options === "back_to_main_menu" ? backOpts : options);
+        const sentMsg = await bot.sendMessage(chatId, message, getMenu(options));
         return sentMsg?.message_id;
     } catch (error) {
         console.error(error);
@@ -41,7 +58,7 @@ async function botEditMessage(bot, chatId, message, lastMsgId = null, options = 
         if (lastMsgId) {
             try {
                 // Attempt to edit last message
-                const sentMsg = await bot.editMessageText(message, { chat_id: chatId, message_id: lastMsgId, ...(options === "cancel" ? cancelOpts : options) });
+                const sentMsg = await bot.editMessageText(message, { chat_id: chatId, message_id: lastMsgId, ...getMenu(options) });
                 return sentMsg?.message_id;
             } catch (error) {
                 console.warn({ error });

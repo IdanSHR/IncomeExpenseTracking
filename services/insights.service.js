@@ -154,8 +154,8 @@ function createExpensesMessage(expenseGroups, totalCategory, categories, totalCo
 
         const expensesList = expenseGroups[category].map((expense) => `${moment(expense.date).format("DD/MM")} -  ${expense.name} (*${expense.cost.toFixed(2)}${lang.GENERAL.CURRENCY}*)`).join("\n");
         expensesMessage += `🔸*${currentCategory?.name || "undefined"}:*\n${expensesList}\n*${lang.INSIGHT.MESSAGE_TOTAL} ${totalCategory[category].toFixed(2)}${lang.GENERAL.CURRENCY} ${
-            lang.INSIGHT.MESSAGE_OUT_OF
-        } ${currentCategory?.monthlyLimit.toFixed(2).toString() || "0"}${lang.GENERAL.CURRENCY}*\n\n`;
+            currentCategory?.monthlyLimit ? `${lang.INSIGHT.MESSAGE_OUT_OF} ${currentCategory?.monthlyLimit.toFixed(2).toString() || "0"}${lang.GENERAL.CURRENCY}` : ""
+        }*\n\n`;
     });
     expensesMessage += `*${lang.INSIGHT.MESSAGE_TOTAL_EXPENSES}: ${totalCost.toFixed(2)}${lang.GENERAL.CURRENCY} *\n\n`;
     return expensesMessage;

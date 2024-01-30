@@ -21,8 +21,11 @@ module.exports = {
         PROMPT_CATEGORY: "📚 Enter the expense category:",
         PROMPT_COST: "💰 Enter the expense amount:",
         SUCCESS_ADDING: "✅ Expense added successfully!",
+        SUCCESS_DELETING: "✅ Expense deleted successfully.",
         ERROR_CREATING: "❌ Failed to create expense",
         ERROR_ADDING: "❌ Failed to add expense",
+        ERROR_DELETING: "❌ Failed to delete expense",
+        ERROR_NO_EXPENSES_CATEGORY: "❌ No expenses found for this category",
     },
     INCOME: {
         PROMPT_NAME: "✏️ Enter the income name:",
@@ -133,10 +136,11 @@ Welcome to the category menu, please select an option from the menu: \n
         },
         EXPENSE: {
             CONTENT: "*Expense Menu 💼*\nThis menu will be available soon.",
+            BACK_TO_MENU: "🔙 Back to Expense Menu",
             BUTTONS: [
                 [
-                    { text: "❌ Delete Expense", callback_data: "delete_expense" },
-                    { text: "📝 Edit Expense", callback_data: "edit_expense" },
+                    { text: "❌ Delete Expense", callback_data: "expense_delete" },
+                    { text: "📝 Edit Expense", callback_data: "expense_edit" },
                 ],
                 [{ text: "🔙 Back to Main Menu", callback_data: "back_to_main_menu" }],
             ],
@@ -145,8 +149,8 @@ Welcome to the category menu, please select an option from the menu: \n
             CONTENT: "*Income Menu 💰*\nThis menu will be available soon.",
             BUTTONS: [
                 [
-                    { text: "❌ Delete Income", callback_data: "delete_expense" },
-                    { text: "📝 Edit Income", callback_data: "edit_expense" },
+                    { text: "❌ Delete Income", callback_data: "income_delete" },
+                    { text: "📝 Edit Income", callback_data: "income_edit" },
                 ],
                 [{ text: "🔙 Back to Main Menu", callback_data: "back_to_main_menu" }],
             ],
