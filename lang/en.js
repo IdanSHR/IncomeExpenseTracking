@@ -1,6 +1,7 @@
 module.exports = {
     GENERAL: {
         CANCEL: "Cancel ❌",
+        FINISH: "Finish ✅",
         BACK_TO_MENU: "🔙 Back to Main Menu",
         CANCEL_ACTION: "❌ Action Canceled",
         ERROR_INVALID_NUMBER: "❌ Invalid number entered",
@@ -20,12 +21,19 @@ module.exports = {
         PROMPT_NAME: "✏️ Enter the expense name:",
         PROMPT_CATEGORY: "📚 Enter the expense category:",
         PROMPT_COST: "💰 Enter the expense amount:",
+        PROMPT_SPLIT: "💰 Enter the number of payments:",
         SUCCESS_ADDING: "✅ Expense added successfully!",
         SUCCESS_DELETING: "✅ Expense deleted successfully.",
+        SUCCESS_SPLITTING: "✅ Expense split successfully.",
+        SUCCESS_ADDING_RECURRING: "✅ Expense set as recurring, every month on the ",
         ERROR_CREATING: "❌ Failed to create expense",
         ERROR_ADDING: "❌ Failed to add expense",
         ERROR_DELETING: "❌ Failed to delete expense",
+        ERROR_ADDING_RECURRING: "❌ Failed to set recurring expense",
+        ERROR_SPLITTING: "❌ Failed to split expense",
         ERROR_NO_EXPENSES_CATEGORY: "❌ No expenses found for this category from the last time",
+        BUTTON_SPLIT: "Split Expense ✒️",
+        BUTTON_RECURRING: "This is a monthly expense 🔁",
     },
     INCOME: {
         PROMPT_NAME: "✏️ Enter the income name:",

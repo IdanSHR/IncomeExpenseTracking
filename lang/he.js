@@ -1,6 +1,7 @@
 module.exports = {
     GENERAL: {
         CANCEL: "ביטול ❌",
+        FINISH: "סיום ✅",
         BACK_TO_MENU: "🔙 חזרה לתפריט הראשי",
         CANCEL_ACTION: "❌ הפעולה בוטלה",
         ERROR_INVALID_NUMBER: "❌ יש להכניס מספר תקני",
@@ -20,12 +21,19 @@ module.exports = {
         PROMPT_NAME: "✏️ יש להכניס את שם ההוצאה:",
         PROMPT_CATEGORY: "📚 יש להכניס את קטגוריית ההוצאה:",
         PROMPT_COST: "💰 יש להכניס את עלות ההוצאה:",
+        PROMPT_SPLIT: "💰 יש להכניס את מספר התשלומים:",
         SUCCESS_ADDING: "✅ ההוצאה נוספה בהצלחה!",
-        SUCCESS_DELETING: "✅ ההוצאה נמחקה בהצלחה.",
+        SUCCESS_DELETING: "✅ ההוצאה נמחקה בהצלחה",
+        SUCCESS_SPLITTING: "✅ ההוצאה פוצלה בהצלחה",
+        SUCCESS_ADDING_RECURRING: "✅ הוצאה הפכה לקבועה, כל חודש ב ",
         ERROR_CREATING: "❌ נכשל ביצירת הוצאה",
         ERROR_ADDING: "❌ נכשל בהוספת הוצאה",
         ERROR_DELETING: "❌ נכשל במחיקת הוצאה",
+        ERROR_ADDING_RECURRING: "❌ נכשל בהגדרת הוצאה חוזרת",
+        ERROR_SPLITTING: "❌ נכשל בפיצול הוצאה",
         ERROR_NO_EXPENSES_CATEGORY: "❌ לא נמצאו הוצאות לקטגוריה זו מהזמן האחרון",
+        BUTTON_SPLIT: "פיצול הוצאה ✒️",
+        BUTTON_RECURRING: "זו הוצאה חודשית 🔁",
     },
     INCOME: {
         PROMPT_NAME: "✏️ יש להכניס את שם ההכנסה:",

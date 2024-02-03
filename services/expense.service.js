@@ -19,6 +19,22 @@ async function saveNewExpense(expense) {
     }
 }
 
+//Create many expenses from an array
+async function saveManyExpenses(expenses) {
+    if (!expenses || expenses.length === 0) {
+        return { error: lang.EXPENSE.ERROR_ADDING };
+    }
+    try {
+        expenses.forEach((expense) => {
+            expense.name = encrypt(expense.name);
+            expense.cost = encrypt(expense.cost.toString());
+        });
+        return await Expense.insertMany(expenses);
+    } catch (error) {
+        return { error };
+    }
+}
+
 // Query expenses and decrypt them
 async function queryExpenses(filters = {}) {
     try {
@@ -94,7 +110,7 @@ async function makeExpenseRecurring(expenseId) {
     try {
         const expense = await Expense.findById(expenseId);
         if (!expense) {
-            return { error: lang.EXPENSE.ERROR_ADDING_RECURRING };
+            return { error: lang.EXPENSE.ERROR_SPLITTING };
         }
 
         expense.isRecurring = true;
@@ -104,4 +120,42 @@ async function makeExpenseRecurring(expenseId) {
     }
 }
 
-module.exports = { saveNewExpense, deleteExpense, queryExpenses, getMonthExpense, makeExpenseRecurring };
+// Split an expense into multiple payments
+async function splitExpense(expenseId, paymentsNumber) {
+    console.log("splitExpense");
+    if (!expenseId) {
+        return { error: lang.EXPENSE.ERROR_SPLITTING };
+    }
+
+    try {
+        const expenseData = await queryExpenses({ _id: expenseId });
+        if (!expenseData) {
+            return { error: lang.EXPENSE.ERROR_SPLITTING };
+        }
+
+        const expense = expenseData[0];
+        const newExpenses = [];
+        const newCost = expense.cost / paymentsNumber;
+        let date = moment(expense.date);
+
+        for (let i = 0; i < paymentsNumber; i++) {
+            newExpenses.push(
+                new Expense({
+                    familyId: expense.familyId,
+                    date: date.toDate(),
+                    name: expense.name,
+                    cost: newCost.toString(),
+                    category: expense.category,
+                })
+            );
+            date.add(1, "months");
+        }
+        saveManyExpenses(newExpenses);
+        deleteExpense(expenseId);
+        return newExpenses;
+    } catch (error) {
+        return { error };
+    }
+}
+
+module.exports = { saveNewExpense, saveManyExpenses, deleteExpense, queryExpenses, getMonthExpense, makeExpenseRecurring, splitExpense };

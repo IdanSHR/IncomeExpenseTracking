@@ -80,5 +80,13 @@ async function botEditMessage(bot, chatId, message, lastMsgId = null, options = 
         console.error(error);
     }
 }
+async function botEditMessageReplyMarkup(bot, chatId, message_id, options = []) {
+    try {
+        const sentMsg = await bot.editMessageReplyMarkup({ inline_keyboard: options }, { chat_id: chatId, message_id: message_id });
+        return sentMsg?.message_id;
+    } catch (error) {
+        console.error(error);
+    }
+}
 
-module.exports = { isAdmin, botSendMessage, botEditMessage };
+module.exports = { isAdmin, botSendMessage, botEditMessage, botEditMessageReplyMarkup };
