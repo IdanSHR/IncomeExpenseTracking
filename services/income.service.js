@@ -18,6 +18,42 @@ async function saveNewIncome(income) {
     }
 }
 
+// Create many incomes from an array
+async function saveManyIncomes(incomes) {
+    if (!incomes || incomes.length === 0) {
+        return { error: lang.INCOME.ERROR_ADDING };
+    }
+
+    try {
+        incomes.forEach((income) => {
+            income.name = encrypt(income.name);
+            income.amount = encrypt(income.amount.toString());
+        });
+        return await Income.insertMany(incomes);
+    } catch (error) {
+        return { error };
+    }
+}
+
+// Update an income by id
+async function updateIncome(incomeId, income) {
+    if (!incomeId || !income) {
+        return { error: lang.INCOME.ERROR_ADDING };
+    }
+
+    try {
+        if (income?.name) {
+            income.name = encrypt(income.name);
+        }
+        if (income?.amount) {
+            income.amount = encrypt(income.amount.toString());
+        }
+
+        return await Income.findByIdAndUpdate(incomeId, income);
+    } catch (error) {
+        return { error };
+    }
+}
 // Query incomes and decrypt them
 async function queryIncomes(filters = {}) {
     try {
@@ -81,4 +117,4 @@ async function getMonthIncomes(family, month = null, year = null) {
     return incomes;
 }
 
-module.exports = { saveNewIncome, deleteIncome, queryIncomes, getMonthIncomes };
+module.exports = { saveNewIncome, saveManyIncomes, updateIncome, deleteIncome, queryIncomes, getMonthIncomes };

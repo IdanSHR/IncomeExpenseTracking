@@ -29,7 +29,6 @@ function expenseCron() {
 
             await Expense.create(newExpense);
         }
-        console.log("done");
     });
 }
 module.exports = expenseCron;

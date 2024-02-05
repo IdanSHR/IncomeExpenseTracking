@@ -2,8 +2,9 @@ const moment = require("moment");
 const { botSendMessage, botEditMessage } = require("../utils/bot");
 const { findUserFamilyId, setStartDay } = require("./family.service");
 const { addCategory, removeCategory, editCategory, getFamilyCategories, setCategoryLimit } = require("./category.service");
-const { queryExpenses, deleteExpense } = require("./expense.service");
+const { queryExpenses, updateExpense, deleteExpense } = require("./expense.service");
 const { queryIncomes, deleteIncome } = require("./income.service");
+const { set } = require("mongoose");
 
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
@@ -59,7 +60,7 @@ async function sendExpenseMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.EXPENSE.BUTTONS);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
-async function sendDeleteExpenseMenu(bot, menuStep, chatId) {
+async function sendExpenseCategoryMenu(bot, menuStep, chatId, action) {
     const familyId = await findUserFamilyId(chatId);
     if (familyId?.error) {
         if (!userSteps[chatId]) userSteps[chatId] = {};
@@ -72,12 +73,12 @@ async function sendDeleteExpenseMenu(bot, menuStep, chatId) {
     }
     const categories = response.data;
     const opts = setMenuButtons([
-        ...categories.map((category) => [{ text: category.name, callback_data: `expense_delete_list_${category._id}` }]),
+        ...categories.map((category) => [{ text: category.name, callback_data: `expense_${action}_list_${category._id}` }]),
         [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_expense_menu" }],
     ]);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
-async function sendDeleteExpenseListMenu(bot, menuStep, chatId, categoryId) {
+async function sendExpenseListMenu(bot, menuStep, chatId, categoryId, action) {
     const familyId = await findUserFamilyId(chatId);
     if (familyId?.error) {
         return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
@@ -89,11 +90,32 @@ async function sendDeleteExpenseListMenu(bot, menuStep, chatId, categoryId) {
     }
     const opts = setMenuButtons([
         ...expenses.map((expense) => [
-            { text: `${moment(expense.date).format("DD/MM")} - ${expense.name} (${expense.cost?.toFixed(2)}${lang.GENERAL.CURRENCY})`, callback_data: `expense_delete_item_${expense._id}` },
+            { text: `${moment(expense.date).format("DD/MM")} - ${expense.name} (${expense.cost?.toFixed(2)}${lang.GENERAL.CURRENCY})`, callback_data: `expense_${action}_item_${expense._id}` },
         ]),
         [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_expense_menu" }],
     ]);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
+}
+async function sendEditExpenseItemMenu(bot, menuStep, chatId, expenseId) {
+    const opts = setMenuButtons([
+        [{ text: lang.EXPENSE.BUTTON_EDIT_NAME, callback_data: `expense_edit_name_${expenseId}` }],
+        [{ text: lang.EXPENSE.BUTTON_EDIT_COST, callback_data: `expense_edit_cost_${expenseId}` }],
+        [{ text: lang.EXPENSE.BUTTON_EDIT_DATE, callback_data: `expense_edit_date_${expenseId}` }],
+        [{ text: lang.EXPENSE.BUTTON_EDIT_CATEGORY, callback_data: `expense_edit_category_${expenseId}` }],
+        [{ text: lang.EXPENSE.BUTTON_EDIT_RECURRING, callback_data: `expense_edit_recurring_${expenseId}` }],
+        [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_expense_menu" }],
+    ]);
+    menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
+}
+async function sendEditExpenseNameMenu(bot, menuStep, chatId, expenseId) {
+    menuStep[chatId].menu = "expense_edit_name";
+    menuStep[chatId].expenseId = expenseId;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.PROMPT_NAME, menuStep[chatId].lastMsgId, "cancel");
+}
+async function sendEditExpenseCostMenu(bot, menuStep, chatId, expenseId) {
+    menuStep[chatId].menu = "expense_edit_cost";
+    menuStep[chatId].expenseId = expenseId;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.PROMPT_COST, menuStep[chatId].lastMsgId, "cancel");
 }
 
 //Income menus
@@ -305,6 +327,25 @@ async function handleDeleteIncome(bot, menuStep, chatId, incomeId) {
     }
     menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.SUCCESS_DELETING, menuStep[chatId].lastMsgId, "back_to_income_menu");
 }
+async function handleEditExpenseName(bot, menuStep, chatId, expenseName) {
+    const response = await updateExpense(menuStep[chatId].expenseId, { name: expenseName });
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    const opts = setMenuButtons([[{ text: lang.EXPENSE.BUTTON_BACK_TO_EDIT, callback_data: `expense_edit_item_${menuStep[chatId].expenseId}` }]]);
+    menuStep[chatId].menu = null;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
+}
+async function handleEditExpenseCost(bot, menuStep, chatId, expenseCost) {
+    const response = await updateExpense(menuStep[chatId].expenseId, { cost: expenseCost });
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    const opts = setMenuButtons([[{ text: lang.EXPENSE.BUTTON_BACK_TO_EDIT, callback_data: `expense_edit_item_${menuStep[chatId].expenseId}` }]]);
+    menuStep[chatId].menu = null;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
+}
+
 module.exports = {
     sendMainMenu,
     sendFamilyMenu,
@@ -312,11 +353,16 @@ module.exports = {
     sendIncomeMenu,
     sendCategoryMenu,
     sendInsightsMenu,
-    sendDeleteExpenseMenu,
-    sendDeleteExpenseListMenu,
+    sendEditExpenseItemMenu,
+    sendExpenseCategoryMenu,
+    sendExpenseListMenu,
+    sendEditExpenseNameMenu,
+    sendEditExpenseCostMenu,
+    sendDeleteIncomeMenu,
     handleDeleteExpense,
     handleDeleteIncome,
-    sendDeleteIncomeMenu,
+    handleEditExpenseName,
+    handleEditExpenseCost,
     addNewCategory,
     renameCategory,
     handleSetCategoryLimit,

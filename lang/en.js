@@ -23,6 +23,7 @@ module.exports = {
         PROMPT_COST: "💰 Enter the expense amount:",
         PROMPT_SPLIT: "💰 Enter the number of payments:",
         SUCCESS_ADDING: "✅ Expense added successfully!",
+        SUCCESS_EDITING: "✅ Expense edited successfully!",
         SUCCESS_DELETING: "✅ Expense deleted successfully.",
         SUCCESS_SPLITTING: "✅ Expense split successfully.",
         SUCCESS_ADDING_RECURRING: "✅ Expense set as recurring, every month on the ",
@@ -34,6 +35,12 @@ module.exports = {
         ERROR_NO_EXPENSES_CATEGORY: "❌ No expenses found for this category from the last time",
         BUTTON_SPLIT: "Split Expense ✒️",
         BUTTON_RECURRING: "This is a monthly expense 🔁",
+        BUTTON_BACK_TO_EDIT: "Back to Expense Edit 🔙",
+        BUTTON_EDIT_NAME: "Edit Expense Name ✏️",
+        BUTTON_EDIT_COST: "Edit Expense Amount 💰",
+        BUTTON_EDIT_CATEGORY: "Edit Expense Category (Coming Soon)📚",
+        BUTTON_EDIT_DATE: "Edit Expense Date (Coming Soon) 📅",
+        BUTTON_EDIT_RECURRING: "Edit Recurring Expense (Coming Soon) 🔁",
     },
     INCOME: {
         PROMPT_NAME: "✏️ Enter the income name:",
@@ -104,16 +111,16 @@ module.exports = {
 Welcome to the settings menu, please select an option from the menu: \n
 🔸 👨‍👩‍👧‍👦 Family: Edit family name and first day of the month.
 🔸 📚 Categories: creating and deleting categories, editing the name of the category and editing its monthly target.
-🔸 💰 Income (Coming Soon).
-🔸 💰 💼 Expense (Coming Soon).
+🔸 💰 Income.
+🔸 💰 💼 Expense.
 🔸 📊 Insights (Coming Soon).`,
             BUTTONS: [
                 [{ text: "👨‍👩‍👧‍👦 Family", callback_data: "menu_family" }],
                 [{ text: "📚 Categories", callback_data: "menu_category" }],
                 [{ text: "📊 Insights (Coming Soon)", callback_data: "menu_insights" }],
                 [
-                    { text: "💰 Income (Coming Soon)", callback_data: "menu_income" },
-                    { text: "💼 Expense (Coming Soon)", callback_data: "menu_expense" },
+                    { text: "💰 Income", callback_data: "menu_income" },
+                    { text: "💼 Expense", callback_data: "menu_expense" },
                 ],
                 [{ text: "❌ Exit", callback_data: "menu_done" }],
             ],

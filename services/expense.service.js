@@ -35,6 +35,25 @@ async function saveManyExpenses(expenses) {
     }
 }
 
+//Update an expense by id
+async function updateExpense(expenseId, expense) {
+    if (!expenseId || !expense) {
+        return { error: lang.EXPENSE.ERROR_ADDING };
+    }
+
+    try {
+        if (expense?.name) {
+            expense.name = encrypt(expense.name);
+        }
+        if (expense?.cost) {
+            expense.cost = encrypt(expense.cost.toString());
+        }
+
+        return await Expense.findByIdAndUpdate(expenseId, expense);
+    } catch (error) {
+        return { error };
+    }
+}
 // Query expenses and decrypt them
 async function queryExpenses(filters = {}) {
     try {
@@ -54,6 +73,20 @@ async function queryExpenses(filters = {}) {
         }
 
         return decryptedExpenses;
+    } catch (error) {
+        return { error };
+    }
+}
+
+//Query one expense by id
+async function findExpenseById(expenseId) {
+    try {
+        const expense = Expense.findById(expenseId);
+        if (!expense) return null;
+
+        expense.name = decrypt(expense.name);
+        expense.cost = parseFloat(decrypt(expense.cost));
+        return expense;
     } catch (error) {
         return { error };
     }
@@ -122,7 +155,6 @@ async function makeExpenseRecurring(expenseId) {
 
 // Split an expense into multiple payments
 async function splitExpense(expenseId, paymentsNumber) {
-    console.log("splitExpense");
     if (!expenseId) {
         return { error: lang.EXPENSE.ERROR_SPLITTING };
     }
@@ -158,4 +190,4 @@ async function splitExpense(expenseId, paymentsNumber) {
     }
 }
 
-module.exports = { saveNewExpense, saveManyExpenses, deleteExpense, queryExpenses, getMonthExpense, makeExpenseRecurring, splitExpense };
+module.exports = { saveNewExpense, updateExpense, saveManyExpenses, deleteExpense, queryExpenses, findExpenseById, getMonthExpense, makeExpenseRecurring, splitExpense };

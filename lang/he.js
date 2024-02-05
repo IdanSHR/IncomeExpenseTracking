@@ -23,6 +23,7 @@ module.exports = {
         PROMPT_COST: "💰 יש להכניס את עלות ההוצאה:",
         PROMPT_SPLIT: "💰 יש להכניס את מספר התשלומים:",
         SUCCESS_ADDING: "✅ ההוצאה נוספה בהצלחה!",
+        SUCCESS_EDITING: "✅ ההוצאה נערכה בהצלחה!",
         SUCCESS_DELETING: "✅ ההוצאה נמחקה בהצלחה",
         SUCCESS_SPLITTING: "✅ ההוצאה פוצלה בהצלחה",
         SUCCESS_ADDING_RECURRING: "✅ הוצאה הפכה לקבועה, כל חודש ב ",
@@ -34,6 +35,12 @@ module.exports = {
         ERROR_NO_EXPENSES_CATEGORY: "❌ לא נמצאו הוצאות לקטגוריה זו מהזמן האחרון",
         BUTTON_SPLIT: "פיצול הוצאה ✒️",
         BUTTON_RECURRING: "זו הוצאה חודשית 🔁",
+        BUTTON_BACK_TO_EDIT: "חזרה לעריכת ההוצאה 🔙",
+        BUTTON_EDIT_NAME: "שינוי שם ההוצאה ✏️",
+        BUTTON_EDIT_COST: "שינוי סכום ההוצאה 💰",
+        BUTTON_EDIT_CATEGORY: "שינוי קטגוריית ההוצאה  (בקרוב) 📚",
+        BUTTON_EDIT_DATE: "שינוי תאריך ההוצאה  (בקרוב) 📅",
+        BUTTON_EDIT_RECURRING: "הפוך להוצאה חוזרת  (בקרוב) 🔁",
     },
     INCOME: {
         PROMPT_NAME: "✏️ יש להכניס את שם ההכנסה:",
@@ -150,7 +157,7 @@ module.exports = {
             BUTTONS: [
                 [
                     { text: "❌ מחיקת הוצאה", callback_data: "expense_delete" },
-                    { text: "📝 עריכת הוצאה (בקרוב)", callback_data: "expense_edit" },
+                    { text: "📝 עריכת הוצאה", callback_data: "expense_edit" },
                 ],
                 [{ text: "🔙  חזרה לתפריט הראשי", callback_data: "back_to_main_menu" }],
             ],
