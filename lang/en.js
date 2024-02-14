@@ -13,7 +13,7 @@ module.exports = {
             { command: "expense", description: "Add a new expense 💸" },
             { command: "income", description: "Add a new income 💰" },
             { command: "status", description: "Monthly expense and income summary 📑" },
-            { command: "categories", description: "Expense breakdown by categories 🗂" },
+            // { command: "categories", description: "Expense breakdown by categories 🗂" },
             { command: "settings", description: "Settings menu for editing details ⚙️" },
         ],
     },
@@ -117,11 +117,11 @@ Welcome to the settings menu, please select an option from the menu: \n
             BUTTONS: [
                 [{ text: "👨‍👩‍👧‍👦 Family", callback_data: "menu_family" }],
                 [{ text: "📚 Categories", callback_data: "menu_category" }],
-                [{ text: "📊 Insights (Coming Soon)", callback_data: "menu_insights" }],
                 [
                     { text: "💰 Income", callback_data: "menu_income" },
                     { text: "💼 Expense", callback_data: "menu_expense" },
                 ],
+                [{ text: "📊 Insights (Coming Soon)", callback_data: "menu_insights" }],
                 [{ text: "❌ Exit", callback_data: "menu_done" }],
             ],
         },

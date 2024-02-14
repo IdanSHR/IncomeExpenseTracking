@@ -13,7 +13,7 @@ module.exports = {
             { command: "expense", description: "הוספת הוצאה חדשה 💸" },
             { command: "income", description: "הוספת הכנסה חדשה 💰" },
             { command: "status", description: "סיכום הוצאות הכנסות החודשי 📑" },
-            { command: "categories", description: "חלוקת ההוצאות לפי קטגוריות 🗂" },
+            // { command: "categories", description: "חלוקת ההוצאות לפי קטגוריות 🗂" },
             { command: "settings", description: "תפריט הגדרות לעריכת הפרטים ⚙️" },
         ],
     },
@@ -117,11 +117,11 @@ module.exports = {
             BUTTONS: [
                 [{ text: "👨‍👩‍👧‍👦 משפחה", callback_data: "menu_family" }],
                 [{ text: "📚 קטגוריות", callback_data: "menu_category" }],
-                [{ text: "📊 סטטיסטיקות (בקרוב)", callback_data: "menu_insights" }],
                 [
                     { text: "💰 הכנסות", callback_data: "menu_income" },
                     { text: "💼 הוצאות", callback_data: "menu_expense" },
                 ],
+                [{ text: "📊 סטטיסטיקות (בקרוב)", callback_data: "menu_insights" }],
                 [{ text: "❌ סיום", callback_data: "menu_done" }],
             ],
         },
