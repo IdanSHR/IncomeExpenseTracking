@@ -82,7 +82,8 @@ function registerExpenseCommands(bot) {
         const familyId = await findUserFamilyId(userId);
         if (familyId?.error) {
             if (!userSteps[chatId]) userSteps[chatId] = {};
-            return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, userSteps[chatId]?.lastMsgId));
+            userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, userSteps[chatId]?.lastMsgId);
+            return delete userSteps[chatId];
         }
 
         const newExpense = new Expense({ familyId });
@@ -106,7 +107,8 @@ function registerExpenseCommands(bot) {
         const familyId = await findUserFamilyId(userId);
         if (familyId?.error) {
             if (!userSteps[chatId]) userSteps[chatId] = {};
-            return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, userSteps[chatId]?.lastMsgId));
+            userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, userSteps[chatId]?.lastMsgId);
+            return delete userSteps[chatId];
         }
 
         let response = await getFamilyCategories(familyId);

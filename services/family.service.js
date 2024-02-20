@@ -15,6 +15,25 @@ async function registerFamily(name, members = []) {
     }
 }
 
+// Join a family by the familyId
+async function joinFamily(familyId, userId) {
+    try {
+        if (familyId.length !== 24) return { error: lang.FAMILY.ERROR_WRONG_FAMILY };
+        const family = await Family.findById(familyId);
+        if (!family) {
+            return { error: lang.FAMILY.ERROR_WRONG_FAMILY };
+        }
+        if (family.members.includes(userId)) {
+            return { error: lang.FAMILY.ERROR_MEMBER_EXISTS };
+        }
+        family.members.push(userId);
+        await family.save();
+        return family.name;
+    } catch (error) {
+        return { error };
+    }
+}
+
 // Edit a family name
 async function setFamilyName(familyId, name) {
     const family = await Family.findById(familyId);
@@ -33,7 +52,7 @@ async function registerFamilyMember(familyId, userId) {
         return { error: lang.FAMILY.ERROR_NOT_FOUND };
     }
     if (family.members.includes(userId)) {
-        return { error: lang.FAMILY.ERROR_FOUND };
+        return { error: lang.FAMILY.ERROR_MEMBER_EXISTS };
     }
     family.members.push(userId);
     await family.save();
@@ -60,6 +79,19 @@ async function removeFamilyMember(familyId, userId) {
     }
     family.members.splice(memberIndex, 1);
     await family.save();
+}
+
+// Return the family members by the familyId
+async function findFamilyMembers(familyId) {
+    try {
+        const family = await Family.findById(familyId);
+        if (!family) {
+            return { error: lang.FAMILY.ERROR_NOT_FOUND };
+        }
+        return family.members;
+    } catch (error) {
+        return { error };
+    }
 }
 
 // Return the family by the userId
@@ -99,7 +131,9 @@ async function setStartDay(familyId, day) {
 module.exports = {
     registerFamily,
     registerFamilyMember,
+    joinFamily,
     removeFamilyMember,
+    findFamilyMembers,
     getFamilyById,
     findUserFamily,
     findUserFamilyId,

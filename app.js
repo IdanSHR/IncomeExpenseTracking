@@ -40,7 +40,7 @@ registerFamilyCommands(bot);
 registerIncomeCommands(bot);
 registerExpenseCommands(bot);
 registerStatisticsCommands(bot);
-expenseCron();
+expenseCron(bot);
 
 bot.onText(/\/userid/, async (msg) => {
     const chatId = msg.chat.id;

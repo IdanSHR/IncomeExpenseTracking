@@ -14,7 +14,8 @@ function registerIncomeCommands(bot) {
         const familyId = await findUserFamilyId(userId);
         if (familyId?.error) {
             if (!incomeSteps[chatId]) incomeSteps[chatId] = {};
-            return (incomeSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_NOT_FOUND, incomeSteps[chatId]?.lastMsgId));
+            incomeSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_NOT_FOUND, incomeSteps[chatId]?.lastMsgId);
+            return delete incomeSteps[chatId];
         }
 
         const newIncome = new Income({ familyId });
