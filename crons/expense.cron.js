@@ -8,7 +8,6 @@ const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
 
 function expenseCron(bot) {
-    findAndCreateExpenses(bot);
     cron.schedule("0 0 * * *", async () => {
         findAndCreateExpenses(bot);
     });
