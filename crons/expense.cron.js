@@ -1,6 +1,5 @@
 const cron = require("node-cron");
 const moment = require("moment");
-const { Expense } = require("../models/Expense");
 const { botSendMessage } = require("../utils/bot");
 const { queryExpenses, saveManyExpenses } = require("../services/expense.service");
 const { findFamilyMembers } = require("../services/family.service");
@@ -8,7 +7,7 @@ const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
 
 function expenseCron(bot) {
-    cron.schedule("0 0 * * *", async () => {
+    cron.schedule("0 12 * * *", async () => {
         findAndCreateExpenses(bot);
     });
 }
@@ -43,16 +42,13 @@ async function findAndCreateExpenses(bot) {
     }, {});
 
     for (const [familyId, expenses] of Object.entries(expensesByFamily)) {
-        if (!expenses.length) {
-            console.log(`No expenses found for family ${familyId}`);
-            continue;
-        }
+        if (!expenses.length) continue;
+
         try {
-            //send with encryption, change later
             await saveManyExpenses(...expenses);
             let message = lang.EXPENSE.SUCCESS_RECREATING_EXPENSES;
             expenses.forEach(async (expense, index) => {
-                message += `${index + 1}. ${expense.name} - $${expense.cost}\n`;
+                message += `${index + 1}. ${expense.name} - ${expense.cost}${lang.GENERAL.CURRENCY}\n`;
             });
 
             const familyMembers = await findFamilyMembers(familyId);
