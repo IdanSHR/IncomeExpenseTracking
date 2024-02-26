@@ -107,15 +107,19 @@ async function sendEditExpenseItemMenu(bot, menuStep, chatId, expenseId) {
     ]);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
-async function sendEditExpenseNameMenu(bot, menuStep, chatId, expenseId) {
-    menuStep[chatId].menu = "expense_edit_name";
-    menuStep[chatId].expenseId = expenseId;
-    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.PROMPT_NAME, menuStep[chatId].lastMsgId, "cancel");
-}
-async function sendEditExpenseCostMenu(bot, menuStep, chatId, expenseId) {
-    menuStep[chatId].menu = "expense_edit_cost";
-    menuStep[chatId].expenseId = expenseId;
-    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.PROMPT_COST, menuStep[chatId].lastMsgId, "cancel");
+async function sendEditExpenseMenu(bot, menuStep, chatId, expenseId, action) {
+    const actionsMap = {
+        name: { menu: "expense_edit_name", prompt: lang.EXPENSE.PROMPT_NAME },
+        cost: { menu: "expense_edit_cost", prompt: lang.EXPENSE.PROMPT_COST },
+        date: { menu: "expense_edit_date", prompt: lang.EXPENSE.PROMPT_DATE },
+        category: { menu: "expense_edit_category", prompt: lang.EXPENSE.PROMPT_CATEGORY },
+    };
+
+    if (actionsMap[action]) {
+        menuStep[chatId].menu = actionsMap[action].menu;
+        menuStep[chatId].expenseId = expenseId;
+        menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, actionsMap[action].prompt, menuStep[chatId].lastMsgId, "cancel");
+    }
 }
 
 //Income menus
@@ -345,6 +349,28 @@ async function handleEditExpenseCost(bot, menuStep, chatId, expenseCost) {
     menuStep[chatId].menu = null;
     menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
 }
+async function handleEditExpenseDate(bot, menuStep, chatId, expenseDay) {
+    const expenseData = await queryExpenses({ _id: menuStep[chatId].expenseId });
+    if (!expenseData) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INSIGHT.ERROR_NOT_FOUND, null, "back_to_expense_menu"));
+    }
+
+    const currentExpenseDate = moment(expenseData?.date);
+    const date = moment([currentExpenseDate.year(), currentExpenseDate.month(), expenseDay]);
+
+    if (!date.isValid()) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.GENERAL.ERROR_INVALID_DATE, null, "back_to_expense_menu"));
+    }
+    console.log({ currentExpenseDate, date });
+
+    const response = await updateExpense(menuStep[chatId].expenseId, { date });
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    const opts = setMenuButtons([[{ text: lang.EXPENSE.BUTTON_BACK_TO_EDIT, callback_data: `expense_edit_item_${menuStep[chatId].expenseId}` }]]);
+    menuStep[chatId].menu = null;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
+}
 
 module.exports = {
     sendMainMenu,
@@ -356,13 +382,13 @@ module.exports = {
     sendEditExpenseItemMenu,
     sendExpenseCategoryMenu,
     sendExpenseListMenu,
-    sendEditExpenseNameMenu,
-    sendEditExpenseCostMenu,
+    sendEditExpenseMenu,
     sendDeleteIncomeMenu,
     handleDeleteExpense,
     handleDeleteIncome,
     handleEditExpenseName,
     handleEditExpenseCost,
+    handleEditExpenseDate,
     addNewCategory,
     renameCategory,
     handleSetCategoryLimit,

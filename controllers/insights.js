@@ -15,7 +15,8 @@ function registerStatisticsCommands(bot) {
     bot.onText(/\/status/, async (msg) => {
         const chatId = msg.chat.id;
         try {
-            if (!insightStep[chatId]) insightStep[chatId] = { currentMonth: moment().month() + 1, currentYear: moment().year() };
+            if (!insightStep[chatId]) insightStep[chatId] = {};
+            Object.assign(insightStep[chatId], { currentMonth: moment().month() + 1, currentYear: moment().year() });
             await sendStatus(bot, insightStep, chatId, false);
         } catch (err) {
             return await botSendMessage(bot, chatId, lang.INSIGHT.ERROR_STATUS);
@@ -52,7 +53,8 @@ function registerStatisticsCommands(bot) {
     bot.onText(/\/categories/, async (msg) => {
         const chatId = msg.chat.id;
         try {
-            if (!insightStep[chatId]) insightStep[chatId] = { currentMonth: moment().month() + 1, currentYear: moment().year() };
+            if (!insightStep[chatId]) insightStep[chatId] = {};
+            Object.assign(insightStep[chatId], { currentMonth: moment().month() + 1, currentYear: moment().year() });
             await sendCategories(bot, insightStep, chatId, false);
         } catch (err) {
             return await botSendMessage(bot, chatId, lang.INSIGHT.ERROR_STATUS);
@@ -61,7 +63,8 @@ function registerStatisticsCommands(bot) {
     bot.onText(/\/monthlyChange/, async (msg) => {
         const chatId = msg.chat.id;
         try {
-            if (!insightStep[chatId]) insightStep[chatId] = { currentMonth: moment().month() + 1, currentYear: moment().year() };
+            if (!insightStep[chatId]) insightStep[chatId] = {};
+            Object.assign(insightStep[chatId], { currentMonth: moment().month() + 1, currentYear: moment().year() });
             await sendMonthlyChange(bot, insightStep, chatId, false);
         } catch (err) {
             return await botSendMessage(bot, chatId, lang.INSIGHT.ERROR_STATUS);
@@ -71,7 +74,8 @@ function registerStatisticsCommands(bot) {
     bot.onText(/\/expensiveDay/, async (msg) => {
         const chatId = msg.chat.id;
         try {
-            if (!insightStep[chatId]) insightStep[chatId] = { currentMonth: moment().month() + 1, currentYear: moment().year() };
+            if (!insightStep[chatId]) insightStep[chatId] = {};
+            Object.assign(insightStep[chatId], { currentMonth: moment().month() + 1, currentYear: moment().year() });
             await sendExpensiveDay(bot, insightStep, chatId, false);
         } catch (err) {
             return await botSendMessage(bot, chatId, lang.INSIGHT.ERROR_STATUS);

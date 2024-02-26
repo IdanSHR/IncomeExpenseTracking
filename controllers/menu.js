@@ -7,8 +7,7 @@ const {
     sendExpenseCategoryMenu,
     sendExpenseListMenu,
     sendEditExpenseItemMenu,
-    sendEditExpenseNameMenu,
-    sendEditExpenseCostMenu,
+    sendEditExpenseMenu,
     sendIncomeMenu,
     sendDeleteIncomeMenu,
     sendCategoryMenu,
@@ -24,6 +23,7 @@ const {
     handleDeleteIncome,
     handleEditExpenseName,
     handleEditExpenseCost,
+    handleEditExpenseDate,
 } = require("../services/menu.service");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
@@ -74,6 +74,17 @@ function registerMenuCommands(bot) {
                     return;
                 }
                 await handleEditExpenseCost(bot, menuStep, chatId, expenseCost);
+            } catch (err) {
+                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_RENAME, menuStep[chatId].lastMsgId, "back_to_main_menu");
+            }
+        } else if (menuStep[chatId]?.menu === "expense_edit_date") {
+            try {
+                const expenseDay = Number(msg.text);
+                if (isNaN(expenseDay)) {
+                    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.GENERAL.ERROR_INVALID_NUMBER, menuStep[chatId].lastMsgId, "back_to_main_menu");
+                    return;
+                }
+                await handleEditExpenseDate(bot, menuStep, chatId, expenseDay);
             } catch (err) {
                 menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_RENAME, menuStep[chatId].lastMsgId, "back_to_main_menu");
             }
@@ -159,30 +170,27 @@ function registerMenuCommands(bot) {
             return await sendExpenseMenu(bot, menuStep, chatId);
         }
         //edit expense
-        else if (data === "expense_edit") {
-            return await sendExpenseCategoryMenu(bot, menuStep, chatId, "edit");
-        } else if (data.includes("expense_edit_list")) {
-            const categoryId = data.split("expense_edit_list_")[1];
-            return await sendExpenseListMenu(bot, menuStep, chatId, categoryId, "edit");
-        } else if (data.includes("expense_edit_item")) {
-            const expenseId = data.split("expense_edit_item_")[1];
-            return await sendEditExpenseItemMenu(bot, menuStep, chatId, expenseId);
-        } else if (data.includes("expense_edit_name")) {
-            const expenseId = data.split("expense_edit_name_")[1];
-            return await sendEditExpenseNameMenu(bot, menuStep, chatId, expenseId);
-        } else if (data.includes("expense_edit_cost")) {
-            const expenseId = data.split("expense_edit_cost_")[1];
-            return await sendEditExpenseCostMenu(bot, menuStep, chatId, expenseId);
-        } // else if (data.includes("expense_edit_category")) {
-        //     const expenseId = data.split("expense_edit_category_")[1];
-        //     return await handleEditExpenseCategory(bot, menuStep, chatId, expenseId);
-        // } else if (data.includes("expense_edit_date")) {
-        //     const expenseId = data.split("expense_edit_date_")[1];
-        //     return await handleEditExpenseDate(bot, menuStep, chatId, expenseId);
-        // } else if (data.includes("expense_edit_recurring")) {
-        //     const expenseId = data.split("expense_edit_recurring_")[1];
-        //     return await handleEditExpenseRecurring(bot, menuStep, chatId, expenseId);
-        // }
+        else if (data.includes("expense_edit")) {
+            if (data === "expense_edit") {
+                return await sendExpenseCategoryMenu(bot, menuStep, chatId, "edit");
+            } else if (data.includes("expense_edit_list")) {
+                const categoryId = data.split("expense_edit_list_")[1];
+                return await sendExpenseListMenu(bot, menuStep, chatId, categoryId, "edit");
+            } else if (data.includes("expense_edit_item")) {
+                const expenseId = data.split("expense_edit_item_")[1];
+                return await sendEditExpenseItemMenu(bot, menuStep, chatId, expenseId);
+            } else if (data.includes("expense_edit_recurring")) {
+                const expenseId = data.split("expense_edit_recurring_")[1];
+                return await sendEditExpenseMenu(bot, menuStep, chatId, expenseId, "recurring");
+            } else {
+                for (let type of ["name", "cost", "category", "date"]) {
+                    if (data.includes(`expense_edit_${type}`)) {
+                        const expenseId = data.split(`expense_edit_${type}_`)[1];
+                        return await sendEditExpenseMenu(bot, menuStep, chatId, expenseId, type);
+                    }
+                }
+            }
+        }
         //delete expense
         else if (data === "expense_delete") {
             return await sendExpenseCategoryMenu(bot, menuStep, chatId, "delete");

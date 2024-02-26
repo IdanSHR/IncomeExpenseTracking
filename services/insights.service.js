@@ -105,7 +105,7 @@ async function sendCategories(bot, insightStep, chatId, edit = true) {
         const proportion = ((category.total / totalExpense) * 100).toFixed(2);
         message += `🔹 ${category.name}: ${proportion}%\n`;
     }
-    return (insightStep[chatId].lastMsgId = await botSendMessage(bot, chatId, message));
+    return await botSendMessage(bot, chatId, message);
 }
 async function sendMonthlyChange(bot, insightStep, chatId, edit = true) {
     const family = await findUserFamily(chatId);
@@ -122,7 +122,7 @@ async function sendMonthlyChange(bot, insightStep, chatId, edit = true) {
     const currentTotal = currentExpenses.reduce((sum, expense) => sum + expense.cost, 0);
     const lastMonthTotal = lastMonthExpenses.reduce((sum, expense) => sum + expense.cost, 0);
     const change = (((currentTotal - lastMonthTotal) / lastMonthTotal) * 100).toFixed(2);
-    insightStep[chatId].lastMsgId = await botSendMessage(bot, chatId, `${lang.INSIGHT.MESSAGE_MONTHLY_CHANGE}: ${change}%`);
+    await botSendMessage(bot, chatId, `${lang.INSIGHT.MESSAGE_MONTHLY_CHANGE}: ${change}%`);
 }
 async function sendExpensiveDay(bot, insightStep, chatId, edit = true) {
     const family = await findUserFamily(chatId);
@@ -140,7 +140,7 @@ async function sendExpensiveDay(bot, insightStep, chatId, edit = true) {
         days[day] += expense.cost;
     });
     const mostCostlyDay = lang.INSIGHT.WEEK_DAYS[days.indexOf(Math.max(...days))];
-    return (insightStep[chatId].lastMsgId = await botSendMessage(bot, chatId, `${lang.INSIGHT.MESSAGE_EXPENSIVE_DAY}: ${mostCostlyDay}`));
+    return botSendMessage(bot, chatId, `${lang.INSIGHT.MESSAGE_EXPENSIVE_DAY}: ${mostCostlyDay}`);
 }
 
 function createExpensesMessage(expenseGroups, totalCategory, categories, totalCost) {
