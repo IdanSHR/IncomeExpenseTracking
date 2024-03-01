@@ -21,6 +21,7 @@ async function saveNewExpense(expense) {
 
 //Create many expenses from an array
 async function saveManyExpenses(expenses) {
+    console.log({ expenses });
     if (!expenses || expenses.length === 0) {
         return { error: lang.EXPENSE.ERROR_ADDING };
     }
