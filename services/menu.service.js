@@ -361,7 +361,6 @@ async function handleEditExpenseDate(bot, menuStep, chatId, expenseDay) {
     if (!date.isValid()) {
         return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.GENERAL.ERROR_INVALID_DATE, null, "back_to_expense_menu"));
     }
-    console.log({ currentExpenseDate, date });
 
     const response = await updateExpense(menuStep[chatId].expenseId, { date });
     if (response?.error) {

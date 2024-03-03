@@ -11,9 +11,12 @@ async function saveNewIncome(income) {
     }
 
     try {
-        income.name = encrypt(income.name);
-        income.amount = encrypt(income.amount.toString());
-        return await Income.create(income);
+        const encryptedIncome = {
+            ...income,
+            name: encrypt(income.name),
+            amount: encrypt(income.amount.toString()),
+        };
+        return await Income.create(encryptedIncome);
     } catch (error) {
         return { error };
     }
@@ -26,11 +29,12 @@ async function saveManyIncomes(incomes) {
     }
 
     try {
-        incomes.forEach((income) => {
-            income.name = encrypt(income.name);
-            income.amount = encrypt(income.amount.toString());
-        });
-        return await Income.insertMany(incomes);
+        const encryptedIncomes = incomes.map((income) => ({
+            ...income,
+            name: encrypt(income.name),
+            amount: encrypt(income.amount.toString()),
+        }));
+        return await Income.insertMany(encryptedIncomes);
     } catch (error) {
         return { error };
     }
@@ -58,7 +62,7 @@ async function updateIncome(incomeId, income) {
 // Query incomes and decrypt them
 async function queryIncomes(filters = {}) {
     try {
-        const incomes = await Income.find(filters).exec();
+        const incomes = await Income.find(filters);
         const decryptedIncomes = [];
 
         for (const income of incomes) {

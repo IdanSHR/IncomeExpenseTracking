@@ -11,9 +11,12 @@ async function saveNewExpense(expense) {
     }
 
     try {
-        expense.name = encrypt(expense.name);
-        expense.cost = encrypt(expense.cost.toString());
-        return await Expense.create(expense);
+        const encryptedExpense = {
+            ...expense,
+            name: encrypt(expense.name),
+            cost: encrypt(expense.cost.toString()),
+        };
+        return await Expense.create(encryptedExpense);
     } catch (error) {
         return { error };
     }
@@ -25,11 +28,12 @@ async function saveManyExpenses(expenses) {
         return { error: lang.EXPENSE.ERROR_ADDING };
     }
     try {
-        expenses.forEach((expense) => {
-            expense.name = encrypt(expense.name);
-            expense.cost = encrypt(expense.cost.toString());
-        });
-        return await Expense.insertMany(expenses);
+        const encryptedExpenses = expenses.map((expense) => ({
+            ...expense,
+            name: encrypt(expense.name),
+            cost: encrypt(expense.cost.toString()),
+        }));
+        return await Expense.insertMany(encryptedExpenses);
     } catch (error) {
         return { error };
     }
@@ -57,7 +61,8 @@ async function updateExpense(expenseId, expense) {
 // Query expenses and decrypt them
 async function queryExpenses(filters = {}) {
     try {
-        const expenses = await Expense.find(filters).sort({ category: 1 }).exec();
+        const expenses = await Expense.find(filters).sort({ category: 1 });
+        console.log({ expenses });
         const decryptedExpenses = [];
 
         for (const expense of expenses) {
@@ -171,15 +176,13 @@ async function splitExpense(expenseId, paymentsNumber) {
         let date = moment(expense.date);
 
         for (let i = 0; i < paymentsNumber; i++) {
-            newExpenses.push(
-                new Expense({
-                    familyId: expense.familyId,
-                    date: date.toDate(),
-                    name: expense.name,
-                    cost: newCost.toString(),
-                    category: expense.category,
-                })
-            );
+            newExpenses.push({
+                familyId: expense.familyId,
+                date: date.toDate(),
+                name: expense.name,
+                cost: newCost.toString(),
+                category: expense.category,
+            });
             date.add(1, "months");
         }
         saveManyExpenses(newExpenses);

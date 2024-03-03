@@ -45,7 +45,12 @@ async function findAndCreateExpenses(bot) {
         if (!expenses.length) continue;
 
         try {
-            await saveManyExpenses([...expenses]);
+            const insertResponse = await saveManyExpenses(expenses);
+            if (insertResponse.error) {
+                console.error(insertResponse.error);
+                continue;
+            }
+
             let message = lang.EXPENSE.SUCCESS_RECREATING_EXPENSES;
             expenses.forEach(async (expense, index) => {
                 message += `${index + 1}. ${expense.name} - ${expense.cost}${lang.GENERAL.CURRENCY}\n`;

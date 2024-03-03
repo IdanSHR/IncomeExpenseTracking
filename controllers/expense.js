@@ -1,4 +1,3 @@
-const { Expense } = require("../models/Expense");
 const { botSendMessage, botEditMessageReplyMarkup } = require("../utils/bot");
 const { findUserFamilyId } = require("../services/family.service");
 const { getFamilyCategories } = require("../services/category.service");
@@ -86,7 +85,7 @@ function registerExpenseCommands(bot) {
             return delete userSteps[chatId];
         }
 
-        const newExpense = new Expense({ familyId });
+        const newExpense = { familyId };
         if (newExpense?.error) {
             if (!userSteps[chatId]) userSteps[chatId] = {};
             return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, newExpense.error, userSteps[chatId]?.lastMsgId));

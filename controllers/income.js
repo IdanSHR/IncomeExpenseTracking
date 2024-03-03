@@ -1,4 +1,3 @@
-const { Income } = require("../models/Income");
 const { botSendMessage } = require("../utils/bot");
 const { findUserFamilyId } = require("../services/family.service");
 const { saveNewIncome, deleteIncome } = require("../services/income.service");
@@ -18,7 +17,7 @@ function registerIncomeCommands(bot) {
             return delete incomeSteps[chatId];
         }
 
-        const newIncome = new Income({ familyId });
+        const newIncome = { familyId };
         if (newIncome?.error) {
             if (!incomeSteps[chatId]) incomeSteps[chatId] = {};
             return (incomeSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, newIncome.error, incomeSteps[chatId]?.lastMsgId));
