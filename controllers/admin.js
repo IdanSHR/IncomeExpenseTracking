@@ -45,7 +45,11 @@ async function registerAdminCommands(bot) {
 
         const options = {
             reply_markup: JSON.stringify({
-                inline_keyboard: [[{ text: lang.ADMIN.SEND_BUG, callback_data: "report_send_bug" }], [{ text: lang.ADMIN.SEND_SUGGEST, callback_data: "report_send_suggest" }]],
+                inline_keyboard: [
+                    [{ text: lang.ADMIN.SEND_BUG, callback_data: "report_send_bug" }],
+                    [{ text: lang.ADMIN.SEND_SUGGEST, callback_data: "report_send_suggest" }],
+                    [{ text: lang.GENERAL.CANCEL, callback_data: "cancel" }],
+                ],
             }),
         };
 
