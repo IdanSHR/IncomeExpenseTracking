@@ -16,7 +16,7 @@ function decrypt(encryptedData) {
         decrypted += decipher.final("utf8");
         return decrypted;
     } catch (error) {
-        return false;
+        return "undefined";
     }
 }
 

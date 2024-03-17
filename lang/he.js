@@ -86,7 +86,7 @@ module.exports = {
         SUCCESS_DELETING: "✅ הקטגוריה נמחקה בהצלחה.",
         SUCCESS_EDITING: `✅ הקטגוריה נערכה בהצלחה.`,
         ERROR_NO_CATEGORIES: "❌ לא נמצאו קטגוריות למשפחה",
-        ERROR_NOT_FOUND: "❌ הקטגורייה המבוקשת לא נמצאה",
+        ERROR_NOT_FOUND: "❌ הקטגורייה המבוקשת לא נמצאה במשפחה",
         DEFAULT: [
             { name: "קניות בסופר 🛒", monthlyLimit: 0 },
             { name: "שכירות 🏠", monthlyLimit: 0 },
@@ -113,6 +113,13 @@ module.exports = {
         WEEK_DAYS: ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"],
         ERROR_STATUS: "❌ נכשל בחישוב ההוצאות וההכנסות, יש לנסות שנית מאוחר יותר",
         ERROR_NOT_FOUND: "🤷‍♂️ לא נמצאו הוצאות על מנת לבצע את החיפוש המבוקש",
+    },
+    ADMIN: {
+        PROMPT_REPORT: "📝 מה סוג הדיווח שהכי מתאים?",
+        PROMPT_DESCRIPTION: "📝 יש לכתוב את התיאור",
+        SEND_BUG: "דיווח על בעיה 🐞",
+        SEND_SUGGEST: "הצעה לשיפור 📝",
+        SUCCESS_REPORT: "✅ הדיווח נשלח בהצלחה",
     },
     MENU: {
         MAIN: {

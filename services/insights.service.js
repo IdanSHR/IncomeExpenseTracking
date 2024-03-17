@@ -18,7 +18,7 @@ async function sendStatus(bot, insightStep, chatId, edit = true) {
     if (response?.error) {
         return (insightStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
     }
-    const categories = response.data;
+    const categories = response;
     const familyStartDay = family.startDay || 1;
     const expenses = await getMonthExpense(family, insightStep[chatId]?.currentMonth, insightStep[chatId]?.currentYear);
     const incomes = await getMonthIncomes(family, insightStep[chatId]?.currentMonth, insightStep[chatId]?.currentYear);
@@ -81,7 +81,7 @@ async function sendCategories(bot, insightStep, chatId, edit = true) {
         return (insightStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
     }
 
-    const categories = response.data;
+    const categories = response;
     const expenses = await getMonthExpense(family);
     if (expenses?.error) {
         return (insightStep[chatId].lastMsgId = await botSendMessage(bot, chatId, expenses.error));
@@ -175,4 +175,9 @@ function createIncomesMessage(incomes) {
 
     return { incomesMessage, totalAmount };
 }
-module.exports = { sendStatus, sendCategories, sendMonthlyChange, sendExpensiveDay };
+module.exports = {
+    sendStatus,
+    sendCategories,
+    sendMonthlyChange,
+    sendExpensiveDay,
+};

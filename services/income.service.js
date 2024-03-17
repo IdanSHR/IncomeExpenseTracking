@@ -6,11 +6,11 @@ const moment = require("moment");
 
 // Create a new income
 async function saveNewIncome(income) {
-    if (!income) {
-        return { error: lang.INCOME.ERROR_ADDING };
-    }
-
     try {
+        if (!income) {
+            throw new Error(lang.INCOME.ERROR_ADDING);
+        }
+
         const encryptedIncome = {
             ...income,
             name: encrypt(income.name),
@@ -18,17 +18,17 @@ async function saveNewIncome(income) {
         };
         return await Income.create(encryptedIncome);
     } catch (error) {
-        return { error };
+        return { error: error.message };
     }
 }
 
 // Create many incomes from an array
 async function saveManyIncomes(incomes) {
-    if (!incomes || incomes.length === 0) {
-        return { error: lang.INCOME.ERROR_ADDING };
-    }
-
     try {
+        if (!incomes || incomes.length === 0) {
+            throw new Error(lang.INCOME.ERROR_ADDING);
+        }
+
         const encryptedIncomes = incomes.map((income) => ({
             ...income,
             name: encrypt(income.name),
@@ -36,44 +36,38 @@ async function saveManyIncomes(incomes) {
         }));
         return await Income.insertMany(encryptedIncomes);
     } catch (error) {
-        return { error };
+        return { error: error.message };
     }
 }
 
 // Update an income by id
 async function updateIncome(incomeId, income) {
-    if (!incomeId || !income) {
-        return { error: lang.INCOME.ERROR_ADDING };
-    }
-
     try {
-        if (income?.name) {
-            income.name = encrypt(income.name);
-        }
-        if (income?.amount) {
-            income.amount = encrypt(income.amount.toString());
+        if (!incomeId || !income) {
+            throw new Error(lang.INCOME.ERROR_ADDING);
         }
 
-        return await Income.findByIdAndUpdate(incomeId, income);
+        const encryptedIncome = {
+            ...income,
+            name: income.name ? encrypt(income.name) : undefined,
+            amount: income.amount ? encrypt(income.amount.toString()) : undefined,
+        };
+
+        return await Income.findByIdAndUpdate(incomeId, encryptedIncome, { new: true });
     } catch (error) {
-        return { error };
+        return { error: error.message };
     }
 }
+
 // Query incomes and decrypt them
 async function queryIncomes(filters = {}) {
     try {
-        const incomes = await Income.find(filters);
-        const decryptedIncomes = [];
-
-        for (const income of incomes) {
-            decryptedIncomes.push({
-                _id: income._id,
-                familyId: income.familyId,
-                date: income.date,
-                name: decrypt(income.name) || "undefined",
-                amount: parseFloat(decrypt(income.amount) || 0),
-            });
-        }
+        const incomes = await Income.find(filters).lean();
+        const decryptedIncomes = incomes.map((income) => ({
+            ...income,
+            name: decrypt(income.name),
+            amount: parseFloat(decrypt(income.amount) || 0),
+        }));
 
         return decryptedIncomes;
     } catch (error) {
@@ -84,45 +78,56 @@ async function queryIncomes(filters = {}) {
 
 // Delete an income
 async function deleteIncome(incomeId) {
-    if (!incomeId) {
-        return { error: lang.INCOME.ERROR_DELETING };
-    }
-
     try {
+        if (!incomeId) {
+            throw new Error(lang.INCOME.ERROR_DELETING);
+        }
+
         return await Income.findByIdAndDelete(incomeId);
     } catch (error) {
-        return { error };
+        return { error: error.message };
     }
 }
 
 // Get all the incomes of a family for a given month
 async function getMonthIncomes(family, month = null, year = null) {
-    if (!family) {
-        return { error: lang.FAMILY.ERROR_WRONG_FAMILY };
-    }
+    try {
+        if (!family) {
+            throw new Error(lang.FAMILY.ERROR_WRONG_FAMILY);
+        }
 
-    let startDate;
-    if (year !== null && month !== null) {
-        startDate = moment([year, month - 1, family.startDay]);
-    } else if (year === null && month !== null) {
-        startDate = moment([moment().year(), month - 1, family.startDay]);
-    } else {
-        startDate = moment().date(family.startDay);
-    }
-    if (moment().date() < family.startDay) {
-        startDate = startDate.subtract(1, "months"); // Shift back one month if before startDay
-    }
-    const endDate = moment(startDate).add(1, "months");
+        let startDate;
+        if (year !== null && month !== null) {
+            startDate = moment([year, month - 1, family.startDay]);
+        } else if (year === null && month !== null) {
+            startDate = moment([moment().year(), month - 1, family.startDay]);
+        } else {
+            startDate = moment().date(family.startDay);
+        }
+        if (moment().date() < family.startDay) {
+            startDate = startDate.subtract(1, "months"); // Shift back one month if before startDay
+        }
+        const endDate = moment(startDate).add(1, "months");
 
-    const incomes = await queryIncomes({
-        familyId: family._id,
-        date: {
-            $gte: startDate.toDate(),
-            $lt: endDate.toDate(),
-        },
-    });
+        const incomes = await queryIncomes({
+            familyId: family._id,
+            date: {
+                $gte: startDate.toDate(),
+                $lt: endDate.toDate(),
+            },
+        });
 
-    return incomes;
+        return incomes;
+    } catch (error) {
+        return { error: error.message };
+    }
 }
 
-module.exports = { saveNewIncome, saveManyIncomes, updateIncome, deleteIncome, queryIncomes, getMonthIncomes };
+module.exports = {
+    saveNewIncome,
+    saveManyIncomes,
+    updateIncome,
+    deleteIncome,
+    queryIncomes,
+    getMonthIncomes,
+};

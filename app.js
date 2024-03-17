@@ -7,7 +7,8 @@ const { registerIncomeCommands } = require("./controllers/income");
 const { registerExpenseCommands } = require("./controllers/expense");
 const { registerStatisticsCommands } = require("./controllers/insights");
 const { registerFamilyCommands } = require("./controllers/family");
-
+const { registerAdminCommands } = require("./controllers/admin");
+const { botSendBroadcast } = require("./utils/bot");
 //Register all Cron Jobs
 const expenseCron = require("./crons/expense.cron");
 
@@ -40,6 +41,7 @@ registerFamilyCommands(bot);
 registerIncomeCommands(bot);
 registerExpenseCommands(bot);
 registerStatisticsCommands(bot);
+registerAdminCommands(bot);
 expenseCron(bot);
 
 bot.onText(/\/userid/, async (msg) => {
@@ -58,13 +60,21 @@ bot.onText(/\/userid/, async (msg) => {
 //     });
 // });
 
+// ---------------
+// IMPORTANT: This is a test endpoints for the broadcast feature! Do not use in production!
+// ---------------
 const express = require("express");
 const cors = require("cors");
-//server
 const app = express();
 app.use(cors());
 
 app.get("/", (req, res) => res.send("Hello World!"));
+app.get("/sendBroadcast", (req, res) => {
+    const message = req.query.message;
+    botSendBroadcast(bot, message);
+    res.send("Broadcast sent");
+});
+
 app.listen(process.env.PORT || 3000, () => {
     console.log("Server is listening on port " + process.env.PORT || 3000);
 });

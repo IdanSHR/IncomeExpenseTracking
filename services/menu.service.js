@@ -1,10 +1,9 @@
 const moment = require("moment");
 const { botSendMessage, botEditMessage } = require("../utils/bot");
-const { findUserFamilyId, setStartDay } = require("./family.service");
+const { findUserFamilyId, setStartDay, setFamilyName } = require("./family.service");
 const { addCategory, removeCategory, editCategory, getFamilyCategories, setCategoryLimit } = require("./category.service");
 const { queryExpenses, updateExpense, deleteExpense } = require("./expense.service");
 const { queryIncomes, deleteIncome } = require("./income.service");
-const { set } = require("mongoose");
 
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
@@ -67,11 +66,11 @@ async function sendExpenseCategoryMenu(bot, menuStep, chatId, action) {
         return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, userSteps[chatId]?.lastMsgId));
     }
 
-    const response = await getFamilyCategories(familyId);
+    const response = await getFamilyCategories(familyId, true);
     if (response?.error) {
         return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
     }
-    const categories = response.data;
+    const categories = response;
     const opts = setMenuButtons([
         ...categories.map((category) => [{ text: category.name, callback_data: `expense_${action}_list_${category._id}` }]),
         [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_expense_menu" }],
@@ -203,7 +202,7 @@ async function deleteCategory(bot, menuStep, chatId) {
         return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId));
     }
 
-    const categories = response.data;
+    const categories = response;
     const opts = {
         reply_markup: {
             inline_keyboard: [...categories.map((category) => [{ text: `${category.name}`, callback_data: `${category._id}` }]), [{ text: lang.GENERAL.CANCEL, callback_data: "cancel" }]],
@@ -238,7 +237,7 @@ async function renameCategory(bot, menuStep, chatId) {
     if (response?.error) {
         return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId));
     }
-    const categories = response.data;
+    const categories = response;
 
     const opts = {
         reply_markup: {
@@ -278,7 +277,7 @@ async function handleSetCategoryLimit(bot, menuStep, chatId) {
     if (response?.error) {
         return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId));
     }
-    const categories = response.data;
+    const categories = response;
 
     const opts = {
         reply_markup: {

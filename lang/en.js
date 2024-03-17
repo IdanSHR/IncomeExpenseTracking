@@ -86,7 +86,7 @@ module.exports = {
         SUCCESS_DELETING: "✅ Category deleted successfully.",
         SUCCESS_EDITING: "✅ Category edited successfully.",
         ERROR_NO_CATEGORIES: "❌ No categories found for the family",
-        ERROR_NOT_FOUND: "❌ The requested category was not found",
+        ERROR_NOT_FOUND: "❌ The requested category was not found in the family",
         DEFAULT: [
             { name: "Groceries 🛒", monthlyLimit: 0 },
             { name: "Rent 🏠", monthlyLimit: 0 },
@@ -113,6 +113,13 @@ module.exports = {
         WEEK_DAYS: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
         ERROR_STATUS: "❌ Failed to calculate expenses and incomes, please try again later",
         ERROR_NOT_FOUND: "🤷‍♂️ No expenses found to perform the requested search",
+    },
+    ADMIN: {
+        PROMPT_REPORT: "📝 Please select the type of report you want to send:",
+        PROMPT_DESCRIPTION: "📝 Please enter the report description:",
+        SEND_BUG: "🐞 Send a bug report",
+        SEND_SUGGEST: "📝 Send a suggestion",
+        SUCCESS_REPORT: "✅ Report sent successfully!",
     },
     MENU: {
         MAIN: {

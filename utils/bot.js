@@ -1,7 +1,8 @@
 require("dotenv").config();
-const adminIds = process.env.TELEGRAM_ADMIN_USERID;
+const adminIds = JSON.parse(process.env.TELEGRAM_ADMIN_USERID);
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
+const { findFamilyMembers, queryFamilies } = require("../services/family.service");
 
 // Options
 const cancelOpts = {
@@ -61,6 +62,29 @@ async function botSendMessage(bot, chatId, message, lastMsgId = null, options = 
     }
 }
 
+async function botSendMessageToFamily(bot, familyId, message, options = []) {
+    const familyMembers = await findFamilyMembers(familyId);
+    if (familyMembers.error) {
+        console.error(familyMembers.error);
+        return;
+    }
+    for (const member of familyMembers) {
+        await botSendMessage(bot, member, message, null, options);
+    }
+}
+
+async function botSendBroadcast(bot, message, options = []) {
+    const familyMembers = await queryFamilies();
+    if (familyMembers.error) {
+        console.error(familyMembers.error);
+        return;
+    }
+    for (const family of familyMembers) {
+        for (const member of family.members) {
+            await botSendMessage(bot, member, message, null, options);
+        }
+    }
+}
 async function botEditMessage(bot, chatId, message, lastMsgId = null, options = []) {
     try {
         if (lastMsgId) {
@@ -89,4 +113,10 @@ async function botEditMessageReplyMarkup(bot, chatId, message_id, options = []) 
     }
 }
 
-module.exports = { isAdmin, botSendMessage, botEditMessage, botEditMessageReplyMarkup };
+async function botSendMessageToAdmins(bot, message, options = []) {
+    for (const adminId of adminIds) {
+        await botSendMessage(bot, adminId, message, null, options);
+    }
+}
+
+module.exports = { isAdmin, botSendMessage, botEditMessage, botEditMessageReplyMarkup, botSendMessageToFamily, botSendBroadcast, botSendMessageToAdmins };

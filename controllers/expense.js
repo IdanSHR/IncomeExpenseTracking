@@ -114,7 +114,7 @@ function registerExpenseCommands(bot) {
         if (response?.error) {
             return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
         }
-        const categories = response.data;
+        const categories = response;
 
         userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.PROMPT_CATEGORY, userSteps[chatId].lastMsgId, {
             reply_markup: {
