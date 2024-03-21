@@ -44,7 +44,6 @@ async function joinFamily(familyId, userId) {
 
 // Edit a family name
 async function setFamilyName(familyId, name) {
-    console.log(familyId, name);
     try {
         const family = await Family.findOneAndUpdate({ _id: familyId }, { name: name }, { new: true });
         if (!family) {

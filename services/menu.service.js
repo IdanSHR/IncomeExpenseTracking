@@ -2,7 +2,7 @@ const moment = require("moment");
 const { botSendMessage, botEditMessage } = require("../utils/bot");
 const { findUserFamilyId, setStartDay, setFamilyName } = require("./family.service");
 const { addCategory, removeCategory, editCategory, getFamilyCategories, setCategoryLimit } = require("./category.service");
-const { queryExpenses, updateExpense, deleteExpense } = require("./expense.service");
+const { queryExpenses, updateExpense, deleteExpense, findExpenseById } = require("./expense.service");
 const { queryIncomes, deleteIncome } = require("./income.service");
 
 const botLanguage = process.env.BOT_LANGUAGE;
@@ -96,12 +96,14 @@ async function sendExpenseListMenu(bot, menuStep, chatId, categoryId, action) {
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
 async function sendEditExpenseItemMenu(bot, menuStep, chatId, expenseId) {
+    const isRecurring = (await findExpenseById(expenseId))?.isRecurring;
+
     const opts = setMenuButtons([
         [{ text: lang.EXPENSE.BUTTON_EDIT_NAME, callback_data: `expense_edit_name_${expenseId}` }],
         [{ text: lang.EXPENSE.BUTTON_EDIT_COST, callback_data: `expense_edit_cost_${expenseId}` }],
         [{ text: lang.EXPENSE.BUTTON_EDIT_DATE, callback_data: `expense_edit_date_${expenseId}` }],
         [{ text: lang.EXPENSE.BUTTON_EDIT_CATEGORY, callback_data: `expense_edit_category_${expenseId}` }],
-        [{ text: lang.EXPENSE.BUTTON_EDIT_RECURRING, callback_data: `expense_edit_recurring_${expenseId}` }],
+        [{ text: isRecurring ? lang.EXPENSE.BUTTON_EDIT_SET_NOT_RECURRING : lang.EXPENSE.BUTTON_EDIT_SET_RECURRING, callback_data: `expense_edit_recurring_${expenseId}` }],
         [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_expense_menu" }],
     ]);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.EXPENSE.CONTENT, menuStep[chatId].lastMsgId, opts);
@@ -115,9 +117,23 @@ async function sendEditExpenseMenu(bot, menuStep, chatId, expenseId, action) {
     };
 
     if (actionsMap[action]) {
+        let opts = "cancel";
+        if (action == "category") {
+            const familyId = await findUserFamilyId(chatId);
+            let response = await getFamilyCategories(familyId);
+            if (response?.error) {
+                return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
+            }
+            const categories = response;
+            opts = setMenuButtons([
+                ...categories.map((category) => [{ text: category.name, callback_data: `expense_edit_set_category_${category._id}` }]),
+                [{ text: lang.GENERAL.CANCEL, callback_data: "cancel" }],
+            ]);
+        }
+
         menuStep[chatId].menu = actionsMap[action].menu;
         menuStep[chatId].expenseId = expenseId;
-        menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, actionsMap[action].prompt, menuStep[chatId].lastMsgId, "cancel");
+        menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, actionsMap[action].prompt, menuStep[chatId].lastMsgId, opts);
     }
 }
 
@@ -126,7 +142,7 @@ async function sendIncomeMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.INCOME.BUTTONS);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.INCOME.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
-async function sendDeleteIncomeMenu(bot, menuStep, chatId, categoryId) {
+async function sendDeleteIncomeMenu(bot, menuStep, chatId) {
     const familyId = await findUserFamilyId(chatId);
     if (familyId?.error) {
         return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
@@ -369,6 +385,28 @@ async function handleEditExpenseDate(bot, menuStep, chatId, expenseDay) {
     menuStep[chatId].menu = null;
     menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
 }
+async function handleEditExpenseCategory(bot, menuStep, chatId, categoryId) {
+    const response = await updateExpense(menuStep[chatId].expenseId, { category: categoryId });
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    const opts = setMenuButtons([[{ text: lang.EXPENSE.BUTTON_BACK_TO_EDIT, callback_data: `expense_edit_item_${menuStep[chatId].expenseId}` }]]);
+    menuStep[chatId].menu = null;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
+}
+async function handleEditExpenseToggleRecurring(bot, menuStep, chatId, expenseId) {
+    const expenseData = await findExpenseById(expenseId);
+    if (!expenseData) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INSIGHT.ERROR_NOT_FOUND, null, "back_to_expense_menu"));
+    }
+    const response = await updateExpense(expenseId, { isRecurring: !expenseData.isRecurring });
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
+    }
+    const opts = setMenuButtons([[{ text: lang.EXPENSE.BUTTON_BACK_TO_EDIT, callback_data: `expense_edit_item_${expenseId}` }]]);
+    menuStep[chatId].menu = null;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
+}
 
 module.exports = {
     sendMainMenu,
@@ -387,6 +425,8 @@ module.exports = {
     handleEditExpenseName,
     handleEditExpenseCost,
     handleEditExpenseDate,
+    handleEditExpenseCategory,
+    handleEditExpenseToggleRecurring,
     addNewCategory,
     renameCategory,
     handleSetCategoryLimit,

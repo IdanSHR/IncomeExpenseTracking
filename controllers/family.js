@@ -44,46 +44,6 @@ async function registerFamilyCommands(bot) {
         }
     });
 
-    // /addmember command to add a member to a family
-    bot.onText(/\/addmember (.+) (.+)/, async (msg, match) => {
-        const chatId = msg.chat.id;
-        const userId = msg.from.id;
-        const familyId = match[1];
-        const memberId = match[2];
-
-        // Check if user is admin
-        if (!isAdmin(userId)) {
-            return bot.sendMessage(chatId, lang.GENERAL.ERROR_ADMIN);
-        }
-
-        try {
-            await registerFamilyMember(familyId, memberId);
-            bot.sendMessage(chatId, lang.FAMILY.SUCCESS_FAMILY_ADDING);
-        } catch (error) {
-            bot.sendMessage(chatId, error?.message);
-        }
-    });
-
-    // /removemember command to remove a member from a family
-    bot.onText(/\/removemember (.+) (.+)/, async (msg, match) => {
-        const chatId = msg.chat.id;
-        const userId = msg.from.id;
-        const familyId = match[1];
-        const memberId = match[2];
-
-        // Check if user is admin
-        if (!isAdmin(userId)) {
-            return bot.sendMessage(chatId, lang.GENERAL.ERROR_ADMIN);
-        }
-
-        try {
-            await removeFamilyMember(familyId, memberId);
-            bot.sendMessage(chatId, lang.FAMILY.SUCCESS_MEMBER_REMOVING);
-        } catch (error) {
-            bot.sendMessage(chatId, error?.message);
-        }
-    });
-
     async function handleStartCommand(bot, msg) {
         const chatId = msg.chat.id;
         if (!menuSteps[chatId]) menuSteps[chatId] = {};

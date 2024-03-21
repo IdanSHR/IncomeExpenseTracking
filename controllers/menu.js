@@ -24,6 +24,8 @@ const {
     handleEditExpenseName,
     handleEditExpenseCost,
     handleEditExpenseDate,
+    handleEditExpenseCategory,
+    handleEditExpenseToggleRecurring,
 } = require("../services/menu.service");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
@@ -181,7 +183,10 @@ function registerMenuCommands(bot) {
                 return await sendEditExpenseItemMenu(bot, menuStep, chatId, expenseId);
             } else if (data.includes("expense_edit_recurring")) {
                 const expenseId = data.split("expense_edit_recurring_")[1];
-                return await sendEditExpenseMenu(bot, menuStep, chatId, expenseId, "recurring");
+                return await handleEditExpenseToggleRecurring(bot, menuStep, chatId, expenseId);
+            } else if (data.includes("expense_edit_set_category")) {
+                const category = data.split("expense_edit_set_category_")[1];
+                return await handleEditExpenseCategory(bot, menuStep, chatId, category);
             } else {
                 for (let type of ["name", "cost", "category", "date"]) {
                     if (data.includes(`expense_edit_${type}`)) {

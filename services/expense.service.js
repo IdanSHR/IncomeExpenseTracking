@@ -44,7 +44,7 @@ async function saveManyExpenses(expenses) {
 async function updateExpense(expenseId, expense) {
     try {
         if (!expenseId || !expense) {
-            throw new Error(lang.EXPENSE.ERROR_ADDING);
+            throw new Error(lang.EXPENSE.ERROR_EDITING);
         }
 
         const encryptedExpense = {
@@ -77,7 +77,7 @@ async function queryExpenses(filters = {}, sort = { category: 1 }) {
 async function findExpenseById(expenseId) {
     try {
         if (!expenseId) {
-            throw new Error(lang.EXPENSE.ERROR_DELETING);
+            throw new Error(lang.EXPENSE.ERROR_NO_EXPENSES);
         }
         const expense = await Expense.findById(expenseId).lean();
         if (!expense) return null;
