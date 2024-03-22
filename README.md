@@ -59,10 +59,10 @@ Open the bot in your web browser at `http://localhost:3000` and follow the on-sc
 ## Screenshots 📸
 
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 20px;">
-<img src="screenshots/1.jpg" alt="Screenshot 1" style="width: 100%;">
-<img src="screenshots/2.jpg" alt="Screenshot 2" style="width: 100%;">
-<img src="screenshots/3.jpg" alt="Screenshot 3" style="width: 100%;">
-<img src="screenshots/4.jpg" alt="Screenshot 4" style="width: 100%;"> </div>
+<img src="screenshots/1.jpg" alt="Screenshot 1" width="150px">
+<img src="screenshots/2.jpg" alt="Screenshot 2" width="150px">
+<img src="screenshots/3.jpg" alt="Screenshot 3" width="150px">
+<img src="screenshots/4.jpg" alt="Screenshot 4" width="150px"> </div>
 
 ## Technologies Used 👨‍💻
 
