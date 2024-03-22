@@ -5,26 +5,16 @@ Welcome to the first fully functional release of the Income Expense Tracking Bot
 ## Features 🚀
 
 1.  📌 **User-Friendly Interface:** A simplistic and intuitive Telegram interface allows users to easily input income and expenses.
-2.
-3.  🏷️ **Categorization:** Organize your income and expenses into diverse categories for a clearer overview of your financial life.
-4.
-5.  🧮 **Automated Calculations:** Automatically calculates total income, expenses, and the net balance, saving you time and preventing errors.
-6.
-7.  📊 **Reports:** Generate detailed reports to analyze your income and expense patterns. The bot provides a range of customizable reports to help you understand your financial behavior better.
-8.
-9.  🎯 **Monthly Targets:** Set monthly financial goals and track your progress towards achieving them with real-time updates.
-10.
-11. 🌐 **Multi-Language Support:** Supports multiple languages, making it accessible to non-English speakers. Choose your preferred language for a personalized experience.
-12.
-13. 🛡️ **Data Encryption:** Implements encryption algorithms to keep your data secure and private.
-14.
-15. ⚙️ **Customizable Settings:** Adjust settings according to your preference. Choose your preferred currency, date format, and more.
-16.
-17. 📆 **Monthly Expenses:** Option to add a recurring expense every month.
-18.
-19. ✏️ **Editing and Deleting Entries:** Functionality to edit or delete particular income or expense entries for greater control over your data.
-20.
-21. 💸 **Dividing Expenses into Installments:** Divide a large expense into smaller, manageable installments for a more accurate representation of your expenditure.
+2.  🏷️ **Categorization:** Organize your income and expenses into diverse categories for a clearer overview of your financial life.
+3.  🧮 **Automated Calculations:** Automatically calculates total income, expenses, and the net balance, saving you time and preventing errors.
+4.  📊 **Reports:** Generate detailed reports to analyze your income and expense patterns. The bot provides a range of customizable reports to help you understand your financial behavior better.
+5.  🎯 **Monthly Targets:** Set monthly financial goals and track your progress towards achieving them with real-time updates.
+6.  🌐 **Multi-Language Support:** Supports multiple languages, making it accessible to non-English speakers. Choose your preferred language for a personalized experience.
+7.  🛡️ **Data Encryption:** Implements encryption algorithms to keep your data secure and private.
+8.  ⚙️ **Customizable Settings:** Adjust settings according to your preference. Choose your preferred currency, date format, and more.
+9.  📆 **Monthly Expenses:** Option to add a recurring expense every month.
+10. ✏️ **Editing and Deleting Entries:** Functionality to edit or delete particular income or expense entries for greater control over your data.
+11. 💸 **Dividing Expenses into Installments:** Divide a large expense into smaller, manageable installments for a more accurate representation of your expenditure.
 
 ## Future Features 🕰️
 
@@ -59,10 +49,10 @@ Open the bot in your web browser at `http://localhost:3000` and follow the on-sc
 ## Screenshots 📸
 
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 20px;">
-<img src="screenshots/1.jpg" alt="Screenshot 1" width="150px">
-<img src="screenshots/2.jpg" alt="Screenshot 2" width="150px">
-<img src="screenshots/3.jpg" alt="Screenshot 3" width="150px">
-<img src="screenshots/4.jpg" alt="Screenshot 4" width="150px"> </div>
+<img src="screenshots/1.jpg" alt="Screenshot 1" width="200px">
+<img src="screenshots/2.jpg" alt="Screenshot 2" width="200px">
+<img src="screenshots/3.jpg" alt="Screenshot 3" width="200px">
+<img src="screenshots/4.jpg" alt="Screenshot 4" width="200px"> </div>
 
 ## Technologies Used 👨‍💻
 
