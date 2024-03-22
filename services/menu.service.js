@@ -3,7 +3,7 @@ const { botSendMessage, botEditMessage } = require("../utils/bot");
 const { findUserFamilyId, setStartDay, setFamilyName } = require("./family.service");
 const { addCategory, removeCategory, editCategory, getFamilyCategories, setCategoryLimit } = require("./category.service");
 const { queryExpenses, updateExpense, deleteExpense, findExpenseById } = require("./expense.service");
-const { queryIncomes, deleteIncome } = require("./income.service");
+const { queryIncomes, deleteIncome, updateIncome } = require("./income.service");
 
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
@@ -142,7 +142,7 @@ async function sendIncomeMenu(bot, menuStep, chatId) {
     const opts = setMenuButtons(lang.MENU.INCOME.BUTTONS);
     menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.INCOME.CONTENT, menuStep[chatId].lastMsgId, opts);
 }
-async function sendDeleteIncomeMenu(bot, menuStep, chatId) {
+async function sendIncomeListMenu(bot, menuStep, chatId, action) {
     const familyId = await findUserFamilyId(chatId);
     if (familyId?.error) {
         return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, menuStep[chatId].lastMsgId, "back_to_expense_menu"));
@@ -154,7 +154,7 @@ async function sendDeleteIncomeMenu(bot, menuStep, chatId) {
     }
     const opts = setMenuButtons([
         ...incomes.map((income) => [
-            { text: `${moment(income.date).format("DD/MM")} - ${income.name} (${income.amount?.toFixed(2)}${lang.GENERAL.CURRENCY})`, callback_data: `income_delete_item_${income._id}` },
+            { text: `${moment(income.date).format("DD/MM")} - ${income.name} (${income.amount?.toFixed(2)}${lang.GENERAL.CURRENCY})`, callback_data: `income_${action}_item_${income._id}` },
         ]),
         [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_income_menu" }],
     ]);
@@ -407,6 +407,69 @@ async function handleEditExpenseToggleRecurring(bot, menuStep, chatId, expenseId
     menuStep[chatId].menu = null;
     menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
 }
+async function sendEditIncomeItemMenu(bot, menuStep, chatId, incomeId) {
+    const opts = setMenuButtons([
+        [{ text: lang.INCOME.BUTTON_EDIT_NAME, callback_data: `income_edit_name_${incomeId}` }],
+        [{ text: lang.INCOME.BUTTON_EDIT_AMOUNT, callback_data: `income_edit_amount_${incomeId}` }],
+        [{ text: lang.INCOME.BUTTON_EDIT_DATE, callback_data: `income_edit_date_${incomeId}` }],
+        [{ text: lang.GENERAL.CANCEL, callback_data: "back_to_income_menu" }],
+    ]);
+    menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.MENU.INCOME.CONTENT, menuStep[chatId].lastMsgId, opts);
+}
+async function sendEditIncomeMenu(bot, menuStep, chatId, incomeId, action) {
+    const actionsMap = {
+        name: { menu: "income_edit_name", prompt: lang.INCOME.PROMPT_NAME },
+        amount: { menu: "income_edit_amount", prompt: lang.INCOME.PROMPT_AMOUNT },
+        date: { menu: "income_edit_date", prompt: lang.INCOME.PROMPT_DATE },
+    };
+
+    if (actionsMap[action]) {
+        let opts = "cancel";
+        menuStep[chatId].menu = actionsMap[action].menu;
+        menuStep[chatId].incomeId = incomeId;
+        menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, actionsMap[action].prompt, menuStep[chatId].lastMsgId, opts);
+    }
+}
+
+async function handleEditIncomeName(bot, menuStep, chatId, incomeName) {
+    const response = await updateIncome(menuStep[chatId].incomeId, { name: incomeName });
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_income_menu"));
+    }
+    const opts = setMenuButtons([[{ text: lang.INCOME.BUTTON_BACK_TO_EDIT, callback_data: `income_edit_item_${menuStep[chatId].incomeId}` }]]);
+    menuStep[chatId].menu = null;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
+}
+async function handleEditIncomeAmount(bot, menuStep, chatId, incomeAmount) {
+    const response = await updateIncome(menuStep[chatId].incomeId, { amount: incomeAmount });
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_income_menu"));
+    }
+    const opts = setMenuButtons([[{ text: lang.INCOME.BUTTON_BACK_TO_EDIT, callback_data: `income_edit_item_${menuStep[chatId].incomeId}` }]]);
+    menuStep[chatId].menu = null;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
+}
+async function handleEditIncomeDate(bot, menuStep, chatId, incomeDay) {
+    const incomeData = await queryIncomes({ _id: menuStep[chatId].incomeId });
+    if (!incomeData) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INSIGHT.ERROR_NOT_FOUND, null, "back_to_income_menu"));
+    }
+
+    const currentIncomeDate = moment(incomeData?.date);
+    const date = moment([currentIncomeDate.year(), currentIncomeDate.month(), incomeDay]);
+
+    if (!date.isValid()) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.GENERAL.ERROR_INVALID_DATE, null, "back_to_income_menu"));
+    }
+
+    const response = await updateIncome(menuStep[chatId].incomeId, { date });
+    if (response?.error) {
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_income_menu"));
+    }
+    const opts = setMenuButtons([[{ text: lang.INCOME.BUTTON_BACK_TO_EDIT, callback_data: `income_edit_item_${menuStep[chatId].incomeId}` }]]);
+    menuStep[chatId].menu = null;
+    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
+}
 
 module.exports = {
     sendMainMenu,
@@ -419,7 +482,9 @@ module.exports = {
     sendExpenseCategoryMenu,
     sendExpenseListMenu,
     sendEditExpenseMenu,
-    sendDeleteIncomeMenu,
+    sendIncomeListMenu,
+    sendEditIncomeMenu,
+    sendEditIncomeItemMenu,
     handleDeleteExpense,
     handleDeleteIncome,
     handleEditExpenseName,
@@ -427,6 +492,9 @@ module.exports = {
     handleEditExpenseDate,
     handleEditExpenseCategory,
     handleEditExpenseToggleRecurring,
+    handleEditIncomeName,
+    handleEditIncomeAmount,
+    handleEditIncomeDate,
     addNewCategory,
     renameCategory,
     handleSetCategoryLimit,

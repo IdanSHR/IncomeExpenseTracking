@@ -9,7 +9,9 @@ const {
     sendEditExpenseItemMenu,
     sendEditExpenseMenu,
     sendIncomeMenu,
-    sendDeleteIncomeMenu,
+    sendIncomeListMenu,
+    sendEditIncomeItemMenu,
+    sendEditIncomeMenu,
     sendCategoryMenu,
     sendInsightsMenu,
     renameFamily,
@@ -26,6 +28,9 @@ const {
     handleEditExpenseDate,
     handleEditExpenseCategory,
     handleEditExpenseToggleRecurring,
+    handleEditIncomeName,
+    handleEditIncomeAmount,
+    handleEditIncomeDate,
 } = require("../services/menu.service");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../lang/" + botLanguage);
@@ -61,12 +66,14 @@ function registerMenuCommands(bot) {
             } catch (err) {
                 menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_EDIT_DAY, menuStep[chatId].lastMsgId, "back_to_main_menu");
             }
-        } else if (menuStep[chatId]?.menu === "expense_edit_name") {
+        }
+        //Expense
+        else if (menuStep[chatId]?.menu === "expense_edit_name") {
             try {
                 const expenseName = msg.text;
                 await handleEditExpenseName(bot, menuStep, chatId, expenseName);
             } catch (err) {
-                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_RENAME, menuStep[chatId].lastMsgId, "back_to_main_menu");
+                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.ERROR_EDITING, menuStep[chatId].lastMsgId, "back_to_main_menu");
             }
         } else if (menuStep[chatId]?.menu === "expense_edit_cost") {
             try {
@@ -77,7 +84,7 @@ function registerMenuCommands(bot) {
                 }
                 await handleEditExpenseCost(bot, menuStep, chatId, expenseCost);
             } catch (err) {
-                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_RENAME, menuStep[chatId].lastMsgId, "back_to_main_menu");
+                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.ERROR_EDITING, menuStep[chatId].lastMsgId, "back_to_main_menu");
             }
         } else if (menuStep[chatId]?.menu === "expense_edit_date") {
             try {
@@ -88,7 +95,39 @@ function registerMenuCommands(bot) {
                 }
                 await handleEditExpenseDate(bot, menuStep, chatId, expenseDay);
             } catch (err) {
-                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.ERROR_RENAME, menuStep[chatId].lastMsgId, "back_to_main_menu");
+                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.EXPENSE.ERROR_EDITING, menuStep[chatId].lastMsgId, "back_to_main_menu");
+            }
+        }
+
+        //Income
+        else if (menuStep[chatId]?.menu === "income_edit_name") {
+            try {
+                const incomeName = msg.text;
+                await handleEditIncomeName(bot, menuStep, chatId, incomeName);
+            } catch (err) {
+                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.ERROR_EDITING, menuStep[chatId].lastMsgId, "back_to_main_menu");
+            }
+        } else if (menuStep[chatId]?.menu === "income_edit_amount") {
+            try {
+                const incomeAmount = Number(msg.text);
+                if (isNaN(incomeAmount)) {
+                    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.GENERAL.ERROR_INVALID_NUMBER, menuStep[chatId].lastMsgId, "back_to_main_menu");
+                    return;
+                }
+                await handleEditIncomeAmount(bot, menuStep, chatId, incomeAmount);
+            } catch (err) {
+                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.ERROR_EDITING, menuStep[chatId].lastMsgId, "back_to_main_menu");
+            }
+        } else if (menuStep[chatId]?.menu === "income_edit_date") {
+            try {
+                const incomeDay = Number(msg.text);
+                if (isNaN(incomeDay)) {
+                    menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.GENERAL.ERROR_INVALID_NUMBER, menuStep[chatId].lastMsgId, "back_to_main_menu");
+                    return;
+                }
+                await handleEditIncomeDate(bot, menuStep, chatId, incomeDay);
+            } catch (err) {
+                menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.ERROR_EDITING, menuStep[chatId].lastMsgId, "back_to_main_menu");
             }
         }
     });
@@ -211,10 +250,22 @@ function registerMenuCommands(bot) {
         else if (data === "back_to_income_menu") {
             return await sendIncomeMenu(bot, menuStep, chatId);
         } else if (data === "income_delete") {
-            return await sendDeleteIncomeMenu(bot, menuStep, chatId);
+            return await sendIncomeListMenu(bot, menuStep, chatId, "delete");
+        } else if (data === "income_edit") {
+            return await sendIncomeListMenu(bot, menuStep, chatId, "edit");
+        } else if (data.includes("income_edit_item")) {
+            const incomeId = data.split("income_edit_item_")[1];
+            return await sendEditIncomeItemMenu(bot, menuStep, chatId, incomeId);
         } else if (data.includes("income_delete_item")) {
             const incomeId = data.split("income_delete_item_")[1];
             return await handleDeleteIncome(bot, menuStep, chatId, incomeId);
+        } else {
+            for (let type of ["name", "amount", "date"]) {
+                if (data.includes(`income_edit_${type}`)) {
+                    const incomeId = data.split(`income_edit_${type}_`)[1];
+                    return await sendEditIncomeMenu(bot, menuStep, chatId, incomeId, type);
+                }
+            }
         }
         bot.answerCallbackQuery(callbackQuery.id);
     });

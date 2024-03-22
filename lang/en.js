@@ -17,6 +17,7 @@ module.exports = {
             { command: "status", description: "Monthly expense and income summary 📑" },
             // { command: "categories", description: "Expense breakdown by categories 🗂" },
             { command: "settings", description: "Settings menu for editing details ⚙️" },
+            { command: "report", description: "Send a bug report or suggestion 🐞" },
         ],
     },
     EXPENSE: {
@@ -52,11 +53,18 @@ module.exports = {
     INCOME: {
         PROMPT_NAME: "✏️ Enter the income name:",
         PROMPT_AMOUNT: "💰 Enter the income amount:",
+        PROMPT_DATE: "📅 Enter the income date (1-31):",
         SUCCESS_ADDING: "✅ Income added successfully!",
         SUCCESS_DELETING: "✅ Income deleted successfully.",
+        SUCCESS_EDITING: "✅ Income edited successfully!",
         ERROR_CREATING: "❌ Failed to create income",
         ERROR_ADDING: "❌ Failed to add income",
+        ERROR_EDITING: "❌ Failed to edit income",
         ERROR_NO_INCOMES: "❌ No incomes found from the last time",
+        BUTTON_BACK_TO_EDIT: "Back to Income Edit 🔙",
+        BUTTON_EDIT_NAME: "Edit Income Name ✏️",
+        BUTTON_EDIT_AMOUNT: "Edit Income Amount 💰",
+        BUTTON_EDIT_DATE: "Edit Income Date📅",
     },
     FAMILY: {
         PROMPT_CREATEORJOIN: "👨‍👩‍👧‍👦 Do you want to create a new family or join an existing one?",
