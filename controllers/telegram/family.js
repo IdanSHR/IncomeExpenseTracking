@@ -1,8 +1,8 @@
-const { registerFamily, registerFamilyMember, joinFamily, removeFamilyMember, findUserFamilyId } = require("../services/family.service");
-const { isAdmin } = require("../utils/bot");
-const { botSendMessage } = require("../utils/bot");
+const { registerFamily, joinFamily, findUserFamilyId } = require("../../services/family.service");
+
+const { botSendMessage } = require("../../utils/bot");
 const botLanguage = process.env.BOT_LANGUAGE;
-const lang = require("../lang/" + botLanguage);
+const lang = require("../../lang/" + botLanguage);
 let menuSteps = {};
 
 async function registerFamilyCommands(bot) {

@@ -1,9 +1,10 @@
-const { botSendMessage, botEditMessageReplyMarkup } = require("../utils/bot");
-const { findUserFamilyId } = require("../services/family.service");
-const { getFamilyCategories } = require("../services/category.service");
-const { saveNewExpense, deleteExpense, makeExpenseRecurring, splitExpense } = require("../services/expense.service");
+const { findUserFamilyId } = require("../../services/family.service");
+const { getFamilyCategories } = require("../../services/category.service");
+const { saveNewExpense, deleteExpense, makeExpenseRecurring, splitExpense } = require("../../services/expense.service");
+
+const { botSendMessage, botEditMessageReplyMarkup } = require("../../utils/bot");
 const botLanguage = process.env.BOT_LANGUAGE;
-const lang = require("../lang/" + botLanguage);
+const lang = require("../../lang/" + botLanguage);
 const userSteps = {};
 
 function registerExpenseCommands(bot) {

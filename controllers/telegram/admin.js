@@ -1,8 +1,8 @@
-const { isAdmin } = require("../utils/bot");
-const { botSendMessage, botSendMessageToAdmins } = require("../utils/bot");
-const { findUserFamily } = require("../services/family.service");
+const { findUserFamily } = require("../../services/family.service");
+
+const { botSendMessage, botSendMessageToAdmins } = require("../../utils/bot");
 const botLanguage = process.env.BOT_LANGUAGE;
-const lang = require("../lang/" + botLanguage);
+const lang = require("../../lang/" + botLanguage);
 let reportSteps = {};
 
 async function registerAdminCommands(bot) {

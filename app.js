@@ -1,16 +1,7 @@
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 
-//Register all Routes
-const { registerMenuCommands } = require("./controllers/menu");
-const { registerIncomeCommands } = require("./controllers/income");
-const { registerExpenseCommands } = require("./controllers/expense");
-const { registerStatisticsCommands } = require("./controllers/insights");
-const { registerFamilyCommands } = require("./controllers/family");
-const { registerAdminCommands } = require("./controllers/admin");
-const { botSendBroadcast } = require("./utils/bot");
-//Register all Cron Jobs
-const expenseCron = require("./crons/expense.cron");
+//==========[ Main ]==========//
 
 //Init ENV variables
 require("dotenv").config();
@@ -25,6 +16,20 @@ try {
 } catch (error) {
     console.error({ error });
 }
+
+//==========[ Telegram Bot ]==========//
+
+//Register all Routes
+const { registerMenuCommands } = require("./controllers/telegram/menu");
+const { registerIncomeCommands } = require("./controllers/telegram/income");
+const { registerExpenseCommands } = require("./controllers/telegram/expense");
+const { registerStatisticsCommands } = require("./controllers/telegram/insights");
+const { registerFamilyCommands } = require("./controllers/telegram/family");
+const { registerAdminCommands } = require("./controllers/telegram/admin");
+const { botSendBroadcast } = require("./utils/bot");
+
+//Register all Cron Jobs
+const expenseCron = require("./crons/expense.cron");
 
 //Init Telegram Bot
 const bot = new TelegramBot(token, { polling: true });
@@ -60,6 +65,7 @@ bot.onText(/\/userid/, async (msg) => {
 //     });
 // });
 
+//==========[ Server ]==========//
 // ---------------
 // IMPORTANT: This is a test endpoints for the broadcast feature! Do not use in production!
 // ---------------

@@ -8,6 +8,3 @@ app.yaml
 
 # General
 TODO.md
-
-#tests
-/controllers/manager.js

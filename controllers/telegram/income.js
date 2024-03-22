@@ -1,8 +1,9 @@
-const { botSendMessage } = require("../utils/bot");
-const { findUserFamilyId } = require("../services/family.service");
-const { saveNewIncome, deleteIncome } = require("../services/income.service");
+const { findUserFamilyId } = require("../../services/family.service");
+const { saveNewIncome, deleteIncome } = require("../../services/income.service");
+
+const { botSendMessage } = require("../../utils/bot");
 const botLanguage = process.env.BOT_LANGUAGE;
-const lang = require("../lang/" + botLanguage);
+const lang = require("../../lang/" + botLanguage);
 const incomeSteps = {};
 
 function registerIncomeCommands(bot) {
