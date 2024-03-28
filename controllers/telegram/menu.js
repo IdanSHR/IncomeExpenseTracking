@@ -139,6 +139,7 @@ function registerMenuCommands(bot) {
             menuStep[chatId].menu = "family_setday";
         } else if (data === "family_editname") {
             menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, lang.FAMILY.PROMPT_RENAME, menuStep[chatId].lastMsgId);
+            menuStep[chatId].menu = "family_setname";
             bot.once("message", async (msg) => {
                 try {
                     const familyNewName = msg.text;
@@ -152,6 +153,7 @@ function registerMenuCommands(bot) {
         //Category Menu
         else if (data === "category_add") {
             menuStep[chatId].lastMsgId[chatId] = await botSendMessage(bot, chatId, lang.CATEGORY.PROMPT_ADD, menuStep[chatId].lastMsgId[chatId]);
+            menuStep[chatId].menu = "category_add";
             bot.once("message", async (msg) => {
                 try {
                     const category = msg.text;
@@ -161,6 +163,7 @@ function registerMenuCommands(bot) {
                 }
             });
         } else if (data === "category_rename") {
+            menuStep[chatId].menu = "category_rename";
             try {
                 await renameCategory(bot, menuStep, chatId);
             } catch (err) {
@@ -272,12 +275,12 @@ function setMenuButtons(buttons) {
 //Main menus
 async function sendMainMenu(bot, menuStep, chatId, edit = true) {
     const opts = setMenuButtons(lang.MENU.MAIN.BUTTONS);
-    const menuContect = lang.MENU.MAIN.CONTENT;
+    const menuContent = lang.MENU.MAIN.CONTENT;
 
     if (edit) {
-        menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, menuContect, menuStep[chatId].lastMsgId, opts);
+        menuStep[chatId].lastMsgId = await botEditMessage(bot, chatId, menuContent, menuStep[chatId].lastMsgId, opts);
     } else {
-        menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, menuContect, menuStep[chatId].lastMsgId, opts);
+        menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, menuContent, menuStep[chatId].lastMsgId, opts);
     }
 }
 
@@ -299,13 +302,13 @@ async function sendExpenseMenu(bot, menuStep, chatId) {
 async function sendExpenseCategoryMenu(bot, menuStep, chatId, action) {
     const familyId = await findUserFamilyId(chatId);
     if (familyId?.error) {
-        if (!userSteps[chatId]) userSteps[chatId] = {};
-        return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, userSteps[chatId]?.lastMsgId));
+        if (!menuStep[chatId]) menuStep[chatId] = {};
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, menuStep[chatId]?.lastMsgId));
     }
 
     const response = await getFamilyCategories(familyId, true);
     if (response?.error) {
-        return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
+        return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
     }
     const categories = response;
     const opts = setMenuButtons([
@@ -359,7 +362,7 @@ async function sendEditExpenseMenu(bot, menuStep, chatId, expenseId, action) {
             const familyId = await findUserFamilyId(chatId);
             let response = await getFamilyCategories(familyId);
             if (response?.error) {
-                return (userSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
+                return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error));
             }
             const categories = response;
             opts = setMenuButtons([
@@ -413,6 +416,7 @@ async function renameFamily(bot, menuStep, chatId, familyNewName) {
     }
 
     await setFamilyName(familyId, familyNewName);
+    menuStep[chatId].menu = null;
     menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.SUCCESS_RENAME + familyNewName, menuStep[chatId].lastMsgId, "back_to_main_menu");
 }
 async function updateStartDay(bot, menuStep, chatId, day) {
@@ -440,7 +444,7 @@ async function addNewCategory(bot, menuStep, chatId, category) {
     if (response?.error) {
         return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId));
     }
-
+    menuStep[chatId].menu = null;
     menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.CATEGORY.SUCCESS_ADDING, menuStep[chatId].lastMsgId, "back_to_main_menu");
 }
 async function deleteCategory(bot, menuStep, chatId) {
@@ -505,6 +509,7 @@ async function renameCategory(bot, menuStep, chatId) {
             menuStep[chatId].menu = null;
             return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.GENERAL.CANCEL_ACTION, menuStep[chatId].lastMsgId, "back_to_main_menu"));
         }
+
         menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.CATEGORY.PROMPT_NEW_NAME, menuStep[chatId].lastMsgId);
 
         bot.once("message", async (msg) => {
@@ -513,7 +518,7 @@ async function renameCategory(bot, menuStep, chatId) {
             if (response?.error) {
                 return (menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, response.error, menuStep[chatId].lastMsgId, "back_to_main_menu"));
             }
-
+            menuStep[chatId].menu = null;
             menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.CATEGORY.SUCCESS_EDITING, menuStep[chatId].lastMsgId, "back_to_main_menu");
             bot.answerCallbackQuery(callbackQuery.id);
         });
@@ -707,4 +712,4 @@ async function handleEditIncomeDate(bot, menuStep, chatId, incomeDay) {
     menuStep[chatId].menu = null;
     menuStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.INCOME.SUCCESS_EDITING, menuStep[chatId].lastMsgId, opts);
 }
-module.exports = { registerMenuCommands };
+module.exports = { registerMenuCommands, menuStep };

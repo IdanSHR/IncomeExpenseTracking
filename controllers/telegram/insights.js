@@ -247,4 +247,4 @@ function createIncomesMessage(incomes) {
 
     return { incomesMessage, totalAmount };
 }
-module.exports = { registerStatisticsCommands };
+module.exports = { registerStatisticsCommands, insightStep };

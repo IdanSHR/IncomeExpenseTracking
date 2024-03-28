@@ -51,19 +51,8 @@ expenseCron(bot);
 
 bot.onText(/\/userid/, async (msg) => {
     const chatId = msg.chat.id;
-    const userId = msg.from.id;
-    return bot.sendMessage(chatId, userId);
+    return bot.sendMessage(chatId, chatId);
 });
-
-//For Tests
-// bot.on("message", () => {
-//     const activeListeners = Object.keys(bot._events);
-
-//     console.log("Active Listeners:");
-//     activeListeners.forEach((eventName) => {
-//         console.log(eventName);
-//     });
-// });
 
 //==========[ Server ]==========//
 // ---------------

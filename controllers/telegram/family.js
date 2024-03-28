@@ -3,7 +3,7 @@ const { registerFamily, joinFamily, findUserFamilyId } = require("../../services
 const { botSendMessage } = require("../../utils/bot");
 const botLanguage = process.env.BOT_LANGUAGE;
 const lang = require("../../lang/" + botLanguage);
-let menuSteps = {};
+const familyStep = {};
 
 async function registerFamilyCommands(bot) {
     bot.onText(/\/start/, async (msg) => {
@@ -14,18 +14,18 @@ async function registerFamilyCommands(bot) {
         const chatId = callbackQuery.message.chat.id;
         const data = callbackQuery.data;
 
-        if (!menuSteps[chatId]) {
+        if (!familyStep[chatId]) {
             return;
         }
-        if (data === "cancel" && menuSteps[chatId] !== undefined) {
-            await botSendMessage(bot, chatId, lang.GENERAL.CANCEL_ACTION, menuSteps[chatId].lastMsgId);
-            delete menuSteps[chatId];
+        if (data === "cancel" && familyStep[chatId] !== undefined) {
+            await botSendMessage(bot, chatId, lang.GENERAL.CANCEL_ACTION, familyStep[chatId].lastMsgId);
+            delete familyStep[chatId];
         } else if (data === "register_new_family") {
-            menuSteps[chatId].action = "register_new_family";
-            menuSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.PROMPT_RENAME, menuSteps[chatId]?.lastMsgId, "cancel");
+            familyStep[chatId].action = "register_new_family";
+            familyStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.PROMPT_RENAME, familyStep[chatId]?.lastMsgId, "cancel");
         } else if (data === "join_existing_family") {
-            menuSteps[chatId].action = "join_existing_family";
-            menuSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.PROMPT_JOIN, menuSteps[chatId]?.lastMsgId, "cancel");
+            familyStep[chatId].action = "join_existing_family";
+            familyStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.PROMPT_JOIN, familyStep[chatId]?.lastMsgId, "cancel");
         }
     });
 
@@ -33,20 +33,20 @@ async function registerFamilyCommands(bot) {
         const chatId = msg.chat.id;
         const familyData = msg.text;
 
-        if (familyData === "/start" || !menuSteps[chatId]) {
+        if (familyData === "/start" || !familyStep[chatId]) {
             return;
         }
 
-        if (menuSteps[chatId].action === "register_new_family") {
+        if (familyStep[chatId].action === "register_new_family") {
             handleRegisterNewFamily(bot, chatId, familyData);
-        } else if (menuSteps[chatId].action === "join_existing_family") {
+        } else if (familyStep[chatId].action === "join_existing_family") {
             handleJoinExistingFamily(bot, chatId, familyData);
         }
     });
 
     async function handleStartCommand(bot, msg) {
         const chatId = msg.chat.id;
-        if (!menuSteps[chatId]) menuSteps[chatId] = {};
+        if (!familyStep[chatId]) familyStep[chatId] = {};
 
         const userFamily = await findUserFamilyId(chatId);
         if (!userFamily?.error) {
@@ -59,31 +59,31 @@ async function registerFamilyCommands(bot) {
             }),
         };
 
-        menuSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.PROMPT_CREATEORJOIN, null, options);
+        familyStep[chatId].lastMsgId = await botSendMessage(bot, chatId, lang.FAMILY.PROMPT_CREATEORJOIN, null, options);
     }
 
     async function handleRegisterNewFamily(bot, chatId, familyName) {
         const familyId = await registerFamily(familyName, [chatId]);
 
         if (familyId?.error) {
-            return (menuSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, menuSteps[chatId].lastMsgId, "cancel"));
+            return (familyStep[chatId].lastMsgId = await botSendMessage(bot, chatId, familyId.error, familyStep[chatId].lastMsgId, "cancel"));
         }
 
         await botSendMessage(bot, chatId, `${lang.FAMILY.SUCCESS_ADDING}`);
         await botSendMessage(bot, chatId, `${familyId}`);
-        delete menuSteps[chatId];
+        delete familyStep[chatId];
     }
 
     async function handleJoinExistingFamily(bot, chatId, familyId) {
         const joinResult = await joinFamily(familyId, chatId);
 
         if (joinResult?.error) {
-            return (menuSteps[chatId].lastMsgId = await botSendMessage(bot, chatId, joinResult.error, menuSteps[chatId].lastMsgId, "cancel"));
+            return (familyStep[chatId].lastMsgId = await botSendMessage(bot, chatId, joinResult.error, familyStep[chatId].lastMsgId, "cancel"));
         }
 
         await botSendMessage(bot, chatId, `${lang.FAMILY.SUCCESS_JOINING} ${joinResult}`);
-        delete menuSteps[chatId];
+        delete familyStep[chatId];
     }
 }
 
-module.exports = { registerFamilyCommands };
+module.exports = { registerFamilyCommands, familyStep };

@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const ExpenseSchema = new mongoose.Schema({
-    familyId: String,
+    familyId: { type: mongoose.Schema.Types.ObjectId, ref: "Family" },
     name: String,
-    category: String,
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
     cost: String,
     isRecurring: { type: Boolean, default: false },
     date: { type: Date, default: Date.now },
